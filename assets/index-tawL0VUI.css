@@ -14,9 +14,11 @@
 .nest-front{z-index:4}
 .turtle-figure{position:relative;z-index:2;height:100%;width:fit-content}
 .turtle-sprite{position:relative;z-index:2}
-.accessory{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:5}
-.accessory-flower-crown,.accessory-sailor-hat,.accessory-sprout-cap{z-index:6}
-.accessory-stripe-scarf,.accessory-bubble-scarf{z-index:3}
+.accessory{position:absolute;object-fit:fill;pointer-events:none}
+.accessory-neck{z-index:3}
+.accessory-head{z-index:6}
+.fill-happy{background:#9dce4a}
+.hearts span,.hearts span:before,.hearts span:after{background:#e2b43a}
 .key.is-next{background:var(--key-color,#fff3b0);outline:none}
 .key.is-next.is-error{background:#ffd0da}
 .key.is-home:not(.is-next){outline:2.5px dashed var(--key-color,var(--ink));outline-offset:-7px;background:#fff}
