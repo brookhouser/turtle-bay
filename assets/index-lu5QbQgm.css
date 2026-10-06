@@ -26,3 +26,4 @@
 .key.is-new:not(.is-next){outline:2.5px dashed var(--key-color,var(--teal-deep));outline-offset:-7px}
 .ch.current{background:var(--key-color,var(--index));border-bottom-color:var(--ink)}
 .ch.current.bad{background:#ffd0da}
+.prompt{font-variant-ligatures:none;font-feature-settings:"liga" 0,"clig" 0,"dlig" 0,"calt" 0;font-kerning:none}.ch{display:inline-block;white-space:pre;font-variant-ligatures:none;font-kerning:none;vertical-align:baseline}
