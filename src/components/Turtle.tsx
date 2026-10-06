@@ -34,7 +34,7 @@ export function Turtle({
       {hat ? (
         <img
           className={`accessory accessory-${hat}`}
-          src={`${base}sprites/accessories/${hat}.png?v=3`}
+          src={`${base}sprites/accessories/${hat}.png?v=4`}
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -43,7 +43,7 @@ export function Turtle({
       {scarf ? (
         <img
           className={`accessory accessory-${scarf}`}
-          src={`${base}sprites/accessories/${scarf}.png?v=3`}
+          src={`${base}sprites/accessories/${scarf}.png?v=4`}
           alt=""
           aria-hidden="true"
           draggable={false}
