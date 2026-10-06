@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/turtle-bay/favicon.svg" />
+    <script>
+      // GitHub Pages serves 404.html for deep links, which returns here as /turtle-bay/?/route.
+      // Restore the real path before the app boots. No effect on a normal visit.
+      (function (loc) {
+        if (loc.search[1] === '/') {
+          var decoded = loc.search
+            .slice(1)
+            .split('&')
+            .map(function (part) {
+              return part.replace(/~and~/g, '&')
+            })
+            .join('?')
+          window.history.replaceState(null, '', loc.pathname.slice(0, -1) + decoded + loc.hash)
+        }
+      })(window.location)
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Turtle Bay is a kids pet game. Care for a turtle and earn coins with typing lessons."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>Turtle Bay</title>
+    <script type="module" crossorigin src="/turtle-bay/assets/index-C6CNo2P8.js"></script>
+    <link rel="stylesheet" crossorigin href="/turtle-bay/assets/index-CZ9ayGl7.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
