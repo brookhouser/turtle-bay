@@ -21,7 +21,7 @@ export function Turtle({
 }: TurtleProps) {
   const file = SPRITE_BY_MOOD[mood] ?? SPRITE_BY_MOOD.idle;
   const base = import.meta.env.BASE_URL || "/turtle-bay/";
-  const src = `${base}sprites/${file}`;
+  const src = `${base}sprites/${file}?v=3`;
   return (
     <div className="turtle-figure">
       <img
@@ -34,7 +34,7 @@ export function Turtle({
       {hat ? (
         <img
           className={`accessory accessory-${hat}`}
-          src={`${base}sprites/accessories/${hat}.png`}
+          src={`${base}sprites/accessories/${hat}.png?v=3`}
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -43,7 +43,7 @@ export function Turtle({
       {scarf ? (
         <img
           className={`accessory accessory-${scarf}`}
-          src={`${base}sprites/accessories/${scarf}.png`}
+          src={`${base}sprites/accessories/${scarf}.png?v=3`}
           alt=""
           aria-hidden="true"
           draggable={false}
