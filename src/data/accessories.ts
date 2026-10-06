@@ -8,19 +8,19 @@ export type Anchor = { x: number; y: number };
 
 export const TURTLE_ANCHORS: Record<SpriteMood, Record<AnchorSlot, Anchor>> = {
   idle: {
-    head: { x: 580 / 1280, y: 150 / 720 },
-    neck: { x: 584 / 1280, y: 428 / 720 },
-    shell: { x: 830 / 1280, y: 450 / 720 },
+    head: { x: 638 / 1280, y: 198 / 720 },
+    neck: { x: 639 / 1280, y: 372 / 720 },
+    shell: { x: 744 / 1280, y: 535 / 720 },
   },
   low: {
-    head: { x: 582 / 1280, y: 170 / 720 },
-    neck: { x: 584 / 1280, y: 430 / 720 },
-    shell: { x: 820 / 1280, y: 450 / 720 },
+    head: { x: 637 / 1280, y: 200 / 720 },
+    neck: { x: 638 / 1280, y: 384 / 720 },
+    shell: { x: 741 / 1280, y: 537 / 720 },
   },
   eat: {
-    head: { x: 582 / 1280, y: 155 / 720 },
-    neck: { x: 586 / 1280, y: 436 / 720 },
-    shell: { x: 830 / 1280, y: 450 / 720 },
+    head: { x: 637 / 1280, y: 198 / 720 },
+    neck: { x: 637 / 1280, y: 358 / 720 },
+    shell: { x: 745 / 1280, y: 532 / 720 },
   },
 };
 
@@ -29,15 +29,18 @@ export const ACCESSORY_GEAR: Record<
   string,
   { slot: AnchorSlot; w: number; h: number; hx: number; hy: number }
 > = {
-  "baseball-cap": { slot: "head", w: 0.22, h: 0.16, hx: 0.5, hy: 0.9 },
-  "sailor-hat": { slot: "head", w: 0.26, h: 0.18, hx: 0.5, hy: 0.88 },
-  "sprout-cap": { slot: "head", w: 0.18, h: 0.22, hx: 0.5, hy: 0.9 },
-  "stripe-scarf": { slot: "neck", w: 0.3, h: 0.34, hx: 0.5, hy: 0.04 },
-  "bubble-scarf": { slot: "neck", w: 0.28, h: 0.32, hx: 0.5, hy: 0.05 },
+  "baseball-cap": { slot: "head", w: 340 / 1280, h: (340 * 435) / 499 / 720, hx: 0.456, hy: 0.98 },
+  "bucket-hat": { slot: "head", w: 430 / 1280, h: (430 * 439) / 625 / 720, hx: 0.5, hy: 0.981 },
+  "sprout-cap": { slot: "head", w: 360 / 1280, h: (360 * 496) / 485 / 720, hx: 0.5, hy: 0.983 },
+  "stripe-scarf": { slot: "neck", w: 380 / 1280, h: (380 * 408) / 474 / 720, hx: 0.496, hy: 0.031 },
+  "navy-bandana": { slot: "neck", w: 400 / 1280, h: (400 * 423) / 564 / 720, hx: 0.5, hy: 0.02 },
 };
 
 export function gearId(id: string) {
-  return id === "flower-crown" ? "baseball-cap" : id;
+  if (id === "flower-crown") return "baseball-cap";
+  if (id === "sailor-hat") return "bucket-hat";
+  if (id === "bubble-scarf") return "navy-bandana";
+  return id;
 }
 
 export function accessoryStyle(id: string, mood: string) {
