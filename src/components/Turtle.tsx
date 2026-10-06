@@ -23,7 +23,7 @@ export function Turtle({
 }: TurtleProps) {
   const file = SPRITE_BY_MOOD[mood] ?? SPRITE_BY_MOOD.idle;
   const base = import.meta.env.BASE_URL || "/turtle-bay/";
-  const src = `${base}sprites/${file}?v=6`;
+  const src = `${base}sprites/${file}?v=7`;
   const hatId = hat ? gearId(hat) : null;
   const scarfId = scarf ? gearId(scarf) : null;
   return (
@@ -38,7 +38,7 @@ export function Turtle({
       {scarfId ? (
         <img
           className={`accessory accessory-neck accessory-${scarfId}`}
-          src={`${base}sprites/accessories/${scarfId}.png?v=6`}
+          src={`${base}sprites/accessories/${scarfId}.png?v=7`}
           alt=""
           aria-hidden="true"
           draggable={false}
@@ -48,7 +48,7 @@ export function Turtle({
       {hatId ? (
         <img
           className={`accessory accessory-head accessory-${hatId}`}
-          src={`${base}sprites/accessories/${hatId}.png?v=6`}
+          src={`${base}sprites/accessories/${hatId}.png?v=7`}
           alt=""
           aria-hidden="true"
           draggable={false}

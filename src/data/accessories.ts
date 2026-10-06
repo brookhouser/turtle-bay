@@ -8,32 +8,65 @@ export type Anchor = { x: number; y: number };
 
 export const TURTLE_ANCHORS: Record<SpriteMood, Record<AnchorSlot, Anchor>> = {
   idle: {
-    head: { x: 638 / 1280, y: 198 / 720 },
-    neck: { x: 639 / 1280, y: 372 / 720 },
+    head: { x: 638 / 1280, y: 202 / 720 },
+    neck: { x: 639 / 1280, y: 364 / 720 },
     shell: { x: 744 / 1280, y: 535 / 720 },
   },
   low: {
     head: { x: 637 / 1280, y: 200 / 720 },
-    neck: { x: 638 / 1280, y: 384 / 720 },
+    neck: { x: 638 / 1280, y: 378 / 720 },
     shell: { x: 741 / 1280, y: 537 / 720 },
   },
   eat: {
-    head: { x: 637 / 1280, y: 198 / 720 },
-    neck: { x: 637 / 1280, y: 358 / 720 },
+    head: { x: 637 / 1280, y: 194 / 720 },
+    neck: { x: 637 / 1280, y: 354 / 720 },
     shell: { x: 745 / 1280, y: 532 / 720 },
   },
 };
 
-/** Hotspot (hx, hy) is the point on the accessory image that snaps to the anchor. */
+/**
+ * Hotspot (hx, hy) is the point on the accessory image that snaps to the anchor.
+ * Hat height is squashed up to 12 percent so the crown stays inside the stage.
+ */
 export const ACCESSORY_GEAR: Record<
   string,
   { slot: AnchorSlot; w: number; h: number; hx: number; hy: number }
 > = {
-  "baseball-cap": { slot: "head", w: 340 / 1280, h: (340 * 435) / 499 / 720, hx: 0.456, hy: 0.98 },
-  "bucket-hat": { slot: "head", w: 430 / 1280, h: (430 * 439) / 625 / 720, hx: 0.5, hy: 0.981 },
-  "sprout-cap": { slot: "head", w: 360 / 1280, h: (360 * 496) / 485 / 720, hx: 0.5, hy: 0.983 },
-  "stripe-scarf": { slot: "neck", w: 380 / 1280, h: (380 * 408) / 474 / 720, hx: 0.496, hy: 0.031 },
-  "navy-bandana": { slot: "neck", w: 400 / 1280, h: (400 * 423) / 564 / 720, hx: 0.5, hy: 0.02 },
+  "baseball-cap": {
+    slot: "head",
+    w: 300 / 1280,
+    h: (300 * 435 * 0.88) / 499 / 720,
+    hx: 0.454,
+    hy: 0.98,
+  },
+  "bucket-hat": {
+    slot: "head",
+    w: 360 / 1280,
+    h: (360 * 439 * 0.88) / 625 / 720,
+    hx: 0.5,
+    hy: 0.981,
+  },
+  "sprout-cap": {
+    slot: "head",
+    w: 290 / 1280,
+    h: (290 * 496 * 0.9) / 485 / 720,
+    hx: 0.5,
+    hy: 0.983,
+  },
+  "stripe-scarf": {
+    slot: "neck",
+    w: 250 / 1280,
+    h: (250 * 216) / 443 / 720,
+    hx: 0.481,
+    hy: 0.049,
+  },
+  "navy-bandana": {
+    slot: "neck",
+    w: 230 / 1280,
+    h: (230 * 296) / 556 / 720,
+    hx: 0.504,
+    hy: 0.035,
+  },
 };
 
 export function gearId(id: string) {
