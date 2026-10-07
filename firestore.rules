@@ -1,0 +1,30 @@
+rules_version = '2';
+// Parents: brookhouser@gmail.com (Kevin) and bbrookhouser@gmail.com (Beth).
+// Emails are compared in lowercase. A kid may only touch the document whose id is their Auth uid.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isParent() {
+      return signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.lower() in [
+          'brookhouser@gmail.com',
+          'bbrookhouser@gmail.com'
+        ];
+    }
+
+    function isOwnKid(kidId) {
+      return signedIn() && request.auth.uid == kidId;
+    }
+
+    match /families/{familyId}/kids/{kidId} {
+      allow get: if isOwnKid(kidId) || isParent();
+      allow list: if isParent();
+      allow create, update: if isOwnKid(kidId) || isParent();
+      allow delete: if isParent();
+    }
+  }
+}

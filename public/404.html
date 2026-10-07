@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Turtle Bay</title>
+    <script>
+      // GitHub Pages project site. Keep the first path segment (turtle-bay),
+      // then send the rest back to index.html as a query the app restores.
+      var pathSegmentsToKeep = 1
+      var loc = window.location
+      loc.replace(
+        loc.protocol +
+          '//' +
+          loc.hostname +
+          (loc.port ? ':' + loc.port : '') +
+          loc.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') +
+          '/?/' +
+          loc.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+          (loc.search ? '&' + loc.search.slice(1).replace(/&/g, '~and~') : '') +
+          loc.hash,
+      )
+    </script>
+  </head>
+  <body></body>
+</html>
