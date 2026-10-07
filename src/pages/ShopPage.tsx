@@ -3,6 +3,7 @@ import { ITEM_CATEGORIES, SHOP_ITEMS } from '../data/catalog'
 import { useBay } from '../context/useBay'
 import { isEquipped, ownedCount } from '../game/logic'
 import { ShopIcon } from '../components/ShopIcon'
+import { Stage } from '../components/Habitat'
 import type { ItemCategory } from '../types'
 
 export function ShopPage() {
@@ -31,6 +32,15 @@ export function ShopPage() {
         <h1>Shop</h1>
         <p>Hats and scarves sit on the turtle. Plants and shell beds layer into the tank you have now.</p>
       </header>
+      <Stage
+        tier={kid.turtle.habitatTier}
+        hat={kid.turtle.equipped.hat}
+        scarf={kid.turtle.equipped.scarf}
+        plants={kid.turtle.equipped.plants}
+        bed={kid.turtle.equipped.bed}
+        mood={kid.turtle.happy < 35 || kid.turtle.hunger < 30 ? 'low' : 'idle'}
+        turtleName={kid.turtle.name}
+      />
       <div className="filters" role="tablist" aria-label="Shop categories">
         {ITEM_CATEGORIES.map((category) => (
           <button

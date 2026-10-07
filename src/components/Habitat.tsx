@@ -62,7 +62,7 @@ export function Stage({
               {tier === 3 ? null : (
                 <img
                   className="nest-back"
-                  src={spriteUrl(tier === 2 ? 'nest-tank-back.png' : 'nest-bowl-back.png')}
+                  src={spriteUrl(tier === 2 ? 'nest-tank-back.png?v=3' : 'nest-bowl-back.png?v=3')}
                   alt=""
                   aria-hidden="true"
                   draggable={false}
@@ -72,7 +72,7 @@ export function Stage({
               {tier === 3 ? null : (
                 <img
                   className="nest-front"
-                  src={spriteUrl(tier === 2 ? 'nest-tank-front.png' : 'nest-bowl-front.png')}
+                  src={spriteUrl(tier === 2 ? 'nest-tank-front.png?v=3' : 'nest-bowl-front.png?v=3')}
                   alt=""
                   aria-hidden="true"
                   draggable={false}

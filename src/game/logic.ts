@@ -13,7 +13,7 @@ import {
   REMATCH_PASS_COINS,
   REMATCH_TRY_COINS,
 } from '../config'
-import { findItem, HABITATS } from '../data/catalog'
+import { currentItemId, findItem, HABITATS } from '../data/catalog'
 import { LESSONS, nextLesson } from '../data/curriculum'
 import { localDay, shiftDay } from '../lib/format'
 import type {
@@ -124,10 +124,12 @@ export function normalizeKid(input: Partial<KidProfile> & { id: string; nickname
     clean: clampMeter(input.turtle?.clean ?? fresh.turtle.clean),
     coins: Math.max(0, Math.round(input.turtle?.coins ?? 0)),
     habitatTier,
-    inventory: input.turtle?.inventory ?? {},
+    inventory: Object.fromEntries(
+      Object.entries(input.turtle?.inventory ?? {}).map(([id, count]) => [currentItemId(id), count]),
+    ),
     equipped: {
-      hat: input.turtle?.equipped?.hat ?? null,
-      scarf: input.turtle?.equipped?.scarf ?? null,
+      hat: input.turtle?.equipped?.hat ? currentItemId(input.turtle.equipped.hat) : null,
+      scarf: input.turtle?.equipped?.scarf ? currentItemId(input.turtle.equipped.scarf) : null,
       plants: Array.isArray(input.turtle?.equipped?.plants) ? input.turtle.equipped.plants.filter(Boolean) : [],
       bed: input.turtle?.equipped?.bed ?? null,
     },

@@ -217,7 +217,7 @@ function Typer({ lesson }: { lesson: PlayableLesson }) {
               <span
                 key={`${charIndex}-${char}`}
                 id={charIndex === index ? 'current-ch' : undefined}
-                className={`ch ${state} ${state === 'current' && wrong ? 'bad' : ''}`}
+                className={`ch ${state} ${state === 'current' && wrong ? 'bad' : ''}${state === 'current' ? ` finger-${fingerFor(char) || 'thumb'}` : ''}`}
               >
                 {char}
               </span>

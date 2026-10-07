@@ -10,7 +10,7 @@
   --line: #d5e8e3;
   --danger: #b4234a;
   --good: #1d7a46;
-  --pinky: #f0a3b0;
+  --pinky: #8aa0b8;
   --ring: #f0c24b;
   --middle: #7dcea0;
   --index: #7eb6e8;
@@ -239,7 +239,7 @@ a { color: inherit; }
 }
 .meter-fill { height: 100%; border-radius: inherit; }
 .fill-hunger { background: #7ec8c0; }
-.fill-happy { background: #f3a4ba; }
+.fill-happy { background: #9dce4a; }
 .fill-clean { background: #8fbf62; }
 .streak-line { margin: 4px 0 0; font-weight: 700; }
 
@@ -249,10 +249,12 @@ a { color: inherit; }
   border: 3px solid var(--ink);
   border-radius: 28px;
   background: #e7f7ff;
+  width: 100%;
 }
-.stage-hero { height: 400px; }
-.stage-card { height: 250px; }
+.stage-hero { height: 470px; }
+.stage-card { height: 310px; }
 .stage-mini { height: 176px; border-width: 2px; border-radius: 16px; }
+.habitat-choice .stage-card { height: 280px; }
 .tier-3.stage { background: #d7f3ee; }
 .habitat-art {
   position: absolute;
@@ -310,6 +312,7 @@ a { color: inherit; }
   max-width: none;
   display: block;
   user-select: none;
+  -webkit-user-drag: none;
 }
 .accessory { position: absolute; object-fit: fill; pointer-events: none; }
 .accessory-neck { z-index: 3; }
@@ -350,7 +353,7 @@ a { color: inherit; }
 .hearts span {
   width: 16px;
   height: 16px;
-  background: #ef6f8a;
+  background: #e2b43a;
   transform: rotate(45deg);
   border: 2px solid #1a1a1a;
 }
@@ -359,7 +362,7 @@ a { color: inherit; }
   position: absolute;
   width: 16px;
   height: 16px;
-  background: #ef6f8a;
+  background: #e2b43a;
   border: 2px solid #1a1a1a;
   border-radius: 50%;
 }
@@ -414,8 +417,11 @@ a { color: inherit; }
   padding: 8px;
   display: grid;
   gap: 4px;
-  justify-items: center;
+  /* Stretch, not center: the stage has no intrinsic width, so centering collapses it to its border. */
+  justify-items: stretch;
 }
+.tier-card .stage, .habitat-choice .stage { width: 100%; }
+.tier-locked { opacity: 0.88; }
 .tier-card strong, .habitat-choice strong { font-size: 1rem; }
 .tier-current, .habitat-choice.on { outline: 4px solid var(--teal); }
 .tier-kicker { font-size: 0.8rem; font-weight: 700; color: var(--ink-soft); }
@@ -495,12 +501,26 @@ th { font-size: 0.9rem; }
   line-height: 1.45;
   overflow-x: auto;
   white-space: pre-wrap;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "calt" 0;
+  font-kerning: none;
 }
-.ch { border-bottom: 3px solid transparent; border-radius: 6px; }
+.ch {
+  display: inline-block;
+  white-space: pre;
+  vertical-align: baseline;
+  font-variant-ligatures: none;
+  font-kerning: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 6px;
+}
 .ch.done { color: var(--good); }
 .ch.current { background: #fff3b0; border-bottom-color: var(--ink); }
 .ch.upcoming { color: #8aa0b5; }
 .ch.bad { background: #ffd0da; }
+/* The current letter takes the color of the finger that types it. */
+.ch.current { background: var(--key-color, var(--index)); }
+.ch.current.bad { background: #ffd0da; }
 .coach { margin: 0; font-size: 1.25rem; font-weight: 700; text-align: center; }
 
 .hands { display: flex; justify-content: center; gap: 28px; min-height: 78px; }
@@ -549,11 +569,15 @@ th { font-size: 0.9rem; }
 .key.is-dim { opacity: 0.45; }
 .key.is-new { outline: 2px dashed var(--teal-deep); outline-offset: -6px; }
 .key.is-next {
-  background: #fff3b0;
+  background: var(--key-color, #fff3b0);
+  outline: none;
   transform: translateY(-3px);
   box-shadow: 0 0 0 3px var(--ink);
 }
 .key.is-error { background: #ffd0da; }
+.key.is-next.is-error { background: #ffd0da; }
+.key.is-home:not(.is-next) { outline: 2.5px dashed var(--key-color, var(--ink)); outline-offset: -7px; background: #fff; }
+.key.is-new:not(.is-next) { outline: 2.5px dashed var(--key-color, var(--teal-deep)); outline-offset: -7px; }
 .key.space { min-height: 48px; }
 .bump {
   position: absolute;
@@ -605,7 +629,7 @@ th { font-size: 0.9rem; }
   .laptop-note { display: block; }
   .login-card, .home-grid, .care-grid, .habitat-layout, .form-grid { grid-template-columns: 1fr; }
   .nav { margin-left: 0; }
-  .stage-hero { height: 340px; }
+  .stage-hero { height: 430px; }
   .key { min-height: 42px; font-size: 0.78rem; }
   .tier-row { overflow-x: auto; padding-bottom: 8px; }
   .tier-slot { min-width: 210px; }

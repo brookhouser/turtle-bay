@@ -2,10 +2,10 @@ export function ShopIcon({ id }: { id: string }) {
   return (
     <svg className="shop-icon" viewBox="0 0 72 72" aria-hidden="true">
       {id === 'sprout-cap' ? <Sprout /> : null}
-      {id === 'bucket-hat' ? <Sailor /> : null}
-      {id === 'baseball-cap' ? <Flowers /> : null}
+      {id === 'bucket-hat' ? <BucketHat /> : null}
+      {id === 'baseball-cap' ? <BallCap /> : null}
       {id === 'stripe-scarf' ? <Stripe /> : null}
-      {id === 'navy-bandana' ? <Bubbles /> : null}
+      {id === 'navy-bandana' ? <Bandana /> : null}
       {id === 'kelp' ? <Kelp /> : null}
       {id === 'sea-grass' ? <Grass /> : null}
       {id === 'coral' ? <Coral /> : null}
@@ -28,38 +28,39 @@ function Sprout() {
     </g>
   )
 }
-function Sailor() {
+function BucketHat() {
   return (
     <g>
-      <ellipse cx="36" cy="44" rx="24" ry="8" fill="#fff" stroke="#1a1a1a" strokeWidth="3" />
-      <path d="M18 44c2-18 34-18 36 0" fill="#fff" stroke="#1a1a1a" strokeWidth="3" />
-      <path d="M20 40h32" stroke="#1f8f86" strokeWidth="4" />
+      <path d="M22 36c2-14 26-14 28 0" fill="#e4c48c" stroke="#1a1a1a" strokeWidth="3" />
+      <ellipse cx="36" cy="40" rx="26" ry="8" fill="#143466" stroke="#1a1a1a" strokeWidth="3" />
+      <path d="M16 40h40" stroke="#1f4d8a" strokeWidth="4" />
     </g>
   )
 }
-function Flowers() {
+function BallCap() {
   return (
     <g>
-      <circle cx="22" cy="36" r="8" fill="#f3a0b8" stroke="#1a1a1a" strokeWidth="3" />
-      <circle cx="36" cy="28" r="8" fill="#f2d15a" stroke="#1a1a1a" strokeWidth="3" />
-      <circle cx="50" cy="36" r="8" fill="#f08a72" stroke="#1a1a1a" strokeWidth="3" />
+      <ellipse cx="36" cy="46" rx="22" ry="8" fill="#143466" stroke="#1a1a1a" strokeWidth="3" />
+      <path d="M16 44c2-16 38-16 40 0" fill="#143466" stroke="#1a1a1a" strokeWidth="3" />
+      <circle cx="36" cy="40" r="4" fill="#7ab840" stroke="#1a1a1a" strokeWidth="2" />
     </g>
   )
 }
 function Stripe() {
   return (
     <g>
-      <path d="M12 30h48v16H12z" fill="#f3b1a6" stroke="#1a1a1a" strokeWidth="3" />
-      <path d="M12 35h48M12 42h48" stroke="#fff7ea" strokeWidth="3" />
+      <path d="M12 30h48v16H12z" fill="#0e756c" stroke="#1a1a1a" strokeWidth="3" />
+      <path d="M12 35h48M12 42h48" stroke="#143466" strokeWidth="3" />
     </g>
   )
 }
-function Bubbles() {
+function Bandana() {
   return (
     <g>
-      <path d="M12 32h48v14H12z" fill="#8fd0e8" stroke="#1a1a1a" strokeWidth="3" />
-      <circle cx="28" cy="39" r="3" fill="#fff" stroke="#1a1a1a" strokeWidth="2" />
-      <circle cx="40" cy="39" r="3" fill="#fff" stroke="#1a1a1a" strokeWidth="2" />
+      <path d="M20 32h32l-8 24H28z" fill="#143466" stroke="#1a1a1a" strokeWidth="3" />
+      <circle cx="32" cy="42" r="2.4" fill="#fff" />
+      <circle cx="40" cy="44" r="2.4" fill="#fff" />
+      <circle cx="36" cy="38" r="2.4" fill="#fff" />
     </g>
   )
 }
@@ -72,9 +73,9 @@ function Grass() {
 function Coral() {
   return (
     <g>
-      <path d="M36 58 V30 M36 44 L22 28 M36 40 L52 24" stroke="#f3a0b8" strokeWidth="6" strokeLinecap="round" />
-      <circle cx="22" cy="26" r="5" fill="#f08a9a" stroke="#1a1a1a" strokeWidth="2" />
-      <circle cx="52" cy="22" r="5" fill="#ef7d8a" stroke="#1a1a1a" strokeWidth="2" />
+      <path d="M36 58 V30 M36 44 L22 28 M36 40 L52 24" stroke="#1f8f86" strokeWidth="6" strokeLinecap="round" />
+      <circle cx="22" cy="26" r="5" fill="#9dce4a" stroke="#1a1a1a" strokeWidth="2" />
+      <circle cx="52" cy="22" r="5" fill="#e4c48c" stroke="#1a1a1a" strokeWidth="2" />
     </g>
   )
 }

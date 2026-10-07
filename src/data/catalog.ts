@@ -29,7 +29,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: 'navy-bandana', name: 'Navy bandana', category: 'scarf', price: 75, blurb: 'A navy wrap with white dots.' },
   { id: 'kelp', name: 'Kelp', category: 'plant', price: 14, blurb: 'Tall green ribbons.' },
   { id: 'sea-grass', name: 'Sea grass', category: 'plant', price: 35, blurb: 'A soft clump of grass.' },
-  { id: 'coral', name: 'Coral bunch', category: 'plant', price: 60, blurb: 'Pink coral for the tank.' },
+  { id: 'coral', name: 'Coral bunch', category: 'plant', price: 60, blurb: 'A bright bunch for the tank.' },
   { id: 'pebble-bed', name: 'Pebble bed', category: 'bed', price: 55, blurb: 'Smooth stones to nap on.' },
   { id: 'sand-pillow', name: 'Sand pillow', category: 'bed', price: 80, blurb: 'A warm pillow of sand.' },
   { id: 'moss-cushion', name: 'Moss cushion', category: 'bed', price: 100, blurb: 'A green cushion.' },
@@ -47,8 +47,20 @@ export const ITEM_CATEGORIES = [
   { id: 'bed', label: 'Shell beds' },
 ] as const
 
+// Items renamed with the boyish palette. Older saves may still hold the old ids.
+const LEGACY_ITEM_IDS: Record<string, string> = {
+  'flower-crown': 'baseball-cap',
+  'sailor-hat': 'bucket-hat',
+  'bubble-scarf': 'navy-bandana',
+}
+
+export function currentItemId(id: string): string {
+  return LEGACY_ITEM_IDS[id] ?? id
+}
+
 export function findItem(id: string): ShopItem | undefined {
-  return SHOP_ITEMS.find((item) => item.id === id)
+  const current = currentItemId(id)
+  return SHOP_ITEMS.find((item) => item.id === current)
 }
 
 export function habitatByTier(tier: number): HabitatInfo {
