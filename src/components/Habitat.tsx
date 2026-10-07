@@ -1,21 +1,126 @@
+import type { CSSProperties } from 'react'
 import { HABITATS } from '../data/catalog'
+import { TIER_SCENES, habitatUrl, propBox, turtleBox, type Box } from '../data/habitatScenes'
 import type { HabitatTier, TurtleMood } from '../types'
 import { ArrowIcon, LockIcon } from './Icons'
 import { BedGraphic, PlantGraphic } from './Props'
 import { Turtle } from './Turtle'
 
-function spriteUrl(file: string): string {
-  const base = import.meta.env.BASE_URL || '/'
-  const prefix = base.endsWith('/') ? base : `${base}/`
-  return `${prefix}sprites/${file}`
+function boxStyle(box: Box): CSSProperties {
+  return { left: `${box.left}%`, top: `${box.top}%`, width: `${box.width}%`, height: `${box.height}%` }
 }
 
-export function HabitatArt({ tier, poster = false }: { tier: HabitatTier; poster?: boolean }) {
-  if (poster || tier === 3) {
-    const file = tier === 2 ? 'poster-tank.png' : tier === 3 ? 'poster-reef.png' : 'poster-bowl.png'
-    return <img className="habitat-art" src={spriteUrl(file)} alt="" aria-hidden="true" draggable={false} />
-  }
-  return <div className="habitat-wash" aria-hidden="true" />
+function sceneVars(tier: HabitatTier): CSSProperties {
+  const scene = TIER_SCENES[tier]
+  return {
+    '--fx': scene.focus.x,
+    '--fy': scene.focus.y,
+    '--bob': `-${scene.bob}%`,
+  } as CSSProperties
+}
+
+const PLANT_ASPECT: Record<string, number> = { kelp: 120 / 160 }
+const BED_ASPECT = 220 / 90
+
+/**
+ * Painted habitat: back layer, shop props, Pebble with his gear, then the front layer
+ * (glass, water, rim or frame) over everything. The scene keeps 16:9 and covers the stage,
+ * cropping toward the tier's focus point.
+ */
+export function HabitatScene({
+  tier,
+  hat,
+  scarf,
+  plants,
+  bed,
+  mood = 'idle',
+  turtleName,
+  showTurtle = true,
+  priority = false,
+}: {
+  tier: HabitatTier
+  hat?: string | null
+  scarf?: string | null
+  plants?: string[]
+  bed?: string | null
+  mood?: TurtleMood
+  turtleName?: string
+  showTurtle?: boolean
+  priority?: boolean
+}) {
+  const scene = TIER_SCENES[tier]
+  const fetchPriority = priority ? 'high' : undefined
+  return (
+    <div className={`scene scene-${scene.key}`} style={sceneVars(tier)}>
+      <img
+        className="scene-layer scene-back"
+        src={habitatUrl(scene.back)}
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        fetchPriority={fetchPriority}
+      />
+      {(plants ?? []).slice(0, scene.plants.length).map((id, index) => {
+        const slot = scene.plants[index]
+        return (
+          <div
+            className={`scene-prop scene-plant slot-${index}`}
+            key={id}
+            style={boxStyle(propBox(slot.x, slot.bottom, slot.w, PLANT_ASPECT[id] ?? 120 / 150))}
+          >
+            <PlantGraphic id={id} />
+          </div>
+        )
+      })}
+      {bed ? (
+        <div
+          className="scene-prop scene-bed"
+          style={boxStyle(propBox(scene.turtle.cx, scene.bed.bottom, scene.bed.w, BED_ASPECT))}
+        >
+          <BedGraphic id={bed} />
+        </div>
+      ) : null}
+      {showTurtle ? (
+        <div className={`scene-pet mood-${mood}`} style={boxStyle(turtleBox(scene.turtle))}>
+          <div className="turtle-bob">
+            <Turtle
+              hat={hat}
+              scarf={scarf}
+              mood={mood}
+              title={turtleName ? `${turtleName} the turtle` : 'Pet turtle'}
+              parts={scene.hatOverFront ? 'body' : 'all'}
+            />
+          </div>
+          {mood === 'pet' ? (
+            <div className="fx hearts" aria-hidden="true">
+              <span /><span /><span />
+            </div>
+          ) : null}
+          {mood === 'clean' ? (
+            <div className="fx bubbles" aria-hidden="true">
+              <span /><span /><span /><span />
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      <img
+        className="scene-layer scene-front"
+        src={habitatUrl(scene.front)}
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        fetchPriority={fetchPriority}
+      />
+      {showTurtle && hat && scene.hatOverFront ? (
+        // Same box and same animation as his body layer, so the hat moves with him.
+        <div className={`scene-pet scene-pet-hat mood-${mood}`} style={boxStyle(turtleBox(scene.turtle))} aria-hidden="true">
+          <div className="turtle-bob">
+            <Turtle hat={hat} mood={mood} parts="hat" />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
 }
 
 export function Stage({
@@ -39,59 +144,36 @@ export function Stage({
   turtleName?: string
   showTurtle?: boolean
 }) {
-  const showPet = showTurtle && size !== 'mini'
+  if (size === 'mini') {
+    // Small tier cards: one flat painting, no turtle.
+    return (
+      <div className={`stage stage-mini tier-${tier}`}>
+        <div className={`scene scene-${TIER_SCENES[tier].key}`} style={sceneVars(tier)}>
+          <img
+            className="scene-layer"
+            src={habitatUrl(TIER_SCENES[tier].card)}
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+            loading="lazy"
+          />
+        </div>
+      </div>
+    )
+  }
   return (
     <div className={`stage stage-${size} tier-${tier}`}>
-      <HabitatArt tier={tier} poster={size === 'mini'} />
-      {size !== 'mini' && bed ? (
-        <div className="prop-bed">
-          <BedGraphic id={bed} />
-        </div>
-      ) : null}
-      {size !== 'mini'
-        ? (plants ?? []).map((id, index) => (
-            <div className={`prop-plant slot-${index}`} key={id}>
-              <PlantGraphic id={id} />
-            </div>
-          ))
-        : null}
-      {showPet ? (
-        <div className={`turtle-anchor mood-${mood}`}>
-          <div className="turtle-bob">
-            <div className="turtle-nest">
-              {tier === 3 ? null : (
-                <img
-                  className="nest-back"
-                  src={spriteUrl(tier === 2 ? 'nest-tank-back.png?v=3' : 'nest-bowl-back.png?v=3')}
-                  alt=""
-                  aria-hidden="true"
-                  draggable={false}
-                />
-              )}
-              <Turtle hat={hat} scarf={scarf} mood={mood} title={turtleName ? `${turtleName} the turtle` : 'Pet turtle'} />
-              {tier === 3 ? null : (
-                <img
-                  className="nest-front"
-                  src={spriteUrl(tier === 2 ? 'nest-tank-front.png?v=3' : 'nest-bowl-front.png?v=3')}
-                  alt=""
-                  aria-hidden="true"
-                  draggable={false}
-                />
-              )}
-            </div>
-          </div>
-          {mood === 'pet' ? (
-            <div className="fx hearts" aria-hidden="true">
-              <span /><span /><span />
-            </div>
-          ) : null}
-          {mood === 'clean' ? (
-            <div className="fx bubbles" aria-hidden="true">
-              <span /><span /><span /><span />
-            </div>
-          ) : null}
-        </div>
-      ) : null}
+      <HabitatScene
+        tier={tier}
+        hat={hat}
+        scarf={scarf}
+        plants={plants}
+        bed={bed}
+        mood={mood}
+        turtleName={turtleName}
+        showTurtle={showTurtle}
+        priority={size === 'hero'}
+      />
     </div>
   )
 }

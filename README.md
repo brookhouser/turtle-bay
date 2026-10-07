@@ -2,7 +2,7 @@
 
 A kids academic pet game for a Chromebook. A child names a turtle, keeps Hunger, Happy, and Clean in good shape, and earns coins in a typing trainer. Those coins buy care, accessories, and bigger habitats. Parents sign in separately and watch progress.
 
-The turtle is the approved Pebble paint in `public/sprites/` (idle, sad, and eating), with hats and scarves layered from `public/sprites/accessories/`. Bowl and tank nests, plus habitat posters, live beside those files. The title lives in `src/config.ts` as `APP_NAME` if you want to rename the bay.
+The turtle is the approved Pebble paint in `public/sprites/` (idle, sad, and eating), with hats and scarves layered from `public/sprites/accessories/`. Habitat scenes are layered WebPs in `public/sprites/habitat/` (a back painting and an RGBA front with Pebble drawn between them; source layers in `art/habitats/`). The title lives in `src/config.ts` as `APP_NAME` if you want to rename the bay.
 
 ## Run it
 

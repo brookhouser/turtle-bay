@@ -13,6 +13,8 @@ type TurtleProps = {
   scarf?: string | null;
   mood?: TurtleMood;
   title?: string;
+  /** "body" is the sprite and neck gear, "hat" is only the hat (for a layer above the habitat front). */
+  parts?: "all" | "body" | "hat";
 };
 
 export function Turtle({
@@ -20,21 +22,24 @@ export function Turtle({
   scarf = null,
   mood = "idle",
   title = "Pet turtle",
+  parts = "all",
 }: TurtleProps) {
   const file = SPRITE_BY_MOOD[mood] ?? SPRITE_BY_MOOD.idle;
   const base = import.meta.env.BASE_URL || "/turtle-bay/";
   const src = `${base}sprites/${file}?v=8`;
-  const hatId = hat ? gearId(hat) : null;
-  const scarfId = scarf ? gearId(scarf) : null;
+  const hatId = hat && parts !== "body" ? gearId(hat) : null;
+  const scarfId = scarf && parts !== "hat" ? gearId(scarf) : null;
   return (
     <div className="turtle-figure">
-      <img
-        className="turtle-sprite"
-        src={src}
-        alt={title}
-        aria-label={title}
-        draggable={false}
-      />
+      {parts === "hat" ? null : (
+        <img
+          className="turtle-sprite"
+          src={src}
+          alt={title}
+          aria-label={title}
+          draggable={false}
+        />
+      )}
       {scarfId ? (
         <img
           className={`accessory accessory-neck accessory-${scarfId}`}
