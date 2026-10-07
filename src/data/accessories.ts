@@ -9,7 +9,7 @@ export type Anchor = { x: number; y: number };
 export const TURTLE_ANCHORS: Record<SpriteMood, Record<AnchorSlot, Anchor>> = {
   idle: {
     head: { x: 638 / 1280, y: 202 / 720 },
-    neck: { x: 639 / 1280, y: 364 / 720 },
+    neck: { x: 639 / 1280, y: 378 / 720 },
     shell: { x: 744 / 1280, y: 535 / 720 },
   },
   low: {
@@ -19,7 +19,7 @@ export const TURTLE_ANCHORS: Record<SpriteMood, Record<AnchorSlot, Anchor>> = {
   },
   eat: {
     head: { x: 637 / 1280, y: 194 / 720 },
-    neck: { x: 637 / 1280, y: 354 / 720 },
+    neck: { x: 637 / 1280, y: 372 / 720 },
     shell: { x: 745 / 1280, y: 532 / 720 },
   },
 };
@@ -55,17 +55,19 @@ export const ACCESSORY_GEAR: Record<
   },
   "stripe-scarf": {
     slot: "neck",
-    w: 250 / 1280,
-    h: (250 * 216) / 443 / 720,
-    hx: 0.481,
-    hy: 0.049,
+    // Preview head is 368px wide; the in-game head is 364px. Crop is 342×221.
+    w: (342 * 364) / 368 / 1280,
+    h: (221 * 364) / 368 / 720,
+    hx: 0.528,
+    hy: 0.192,
   },
   "navy-bandana": {
     slot: "neck",
-    w: 230 / 1280,
-    h: (230 * 296) / 556 / 720,
+    // Preview head is 366px wide; the in-game head is 364px. Crop is 285×158.
+    w: (285 * 364) / 366 / 1280,
+    h: (158 * 364) / 366 / 720,
     hx: 0.504,
-    hy: 0.035,
+    hy: 0.212,
   },
 };
 
