@@ -10,5 +10,6 @@ export type FirebaseApi = {
   signInKid: (nickname: string, pin: string) => Promise<KidProfile>
   createKidAsParent: (nickname: string, pin: string) => Promise<KidProfile>
   signInParent: () => Promise<{ email: string }>
+  isParentUser: (user: User) => Promise<boolean>
   signOutBay: () => Promise<void>
 }

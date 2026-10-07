@@ -131,11 +131,20 @@ export async function createKidAsParent(nickname: string, pin: string): Promise<
   }
 }
 
+// Matches isParent() in firestore.rules: Google sign in, verified email, on the list.
+// Email/Password is on for kid bays, so a password account using a parent address never counts.
+export async function isParentUser(user: User): Promise<boolean> {
+  const email = user.email?.toLowerCase() ?? ''
+  if (!email || !user.emailVerified || !getAllowlist().includes(email)) return false
+  const token = await user.getIdTokenResult()
+  return token.signInProvider === 'google.com' && token.claims.email_verified === true
+}
+
 export async function signInParent(): Promise<{ email: string }> {
   try {
     const cred = await signInWithPopup(getAuth(primaryApp()), new GoogleAuthProvider())
     const email = cred.user.email?.toLowerCase() ?? ''
-    if (!getAllowlist().includes(email)) {
+    if (!(await isParentUser(cred.user))) {
       await signOut(getAuth(primaryApp()))
       throw new Error('That Google account is not on the parent list.')
     }

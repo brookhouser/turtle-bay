@@ -1,5 +1,8 @@
 rules_version = '2';
 // Parents: brookhouser@gmail.com (Kevin) and bbrookhouser@gmail.com (Beth).
+// A parent must sign in with Google, and Google must report the email as verified.
+// Email/Password is on for kid bays, so a password account that merely claims a
+// parent address is never treated as a parent.
 // Emails are compared in lowercase. A kid may only touch the document whose id is their Auth uid.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -9,6 +12,8 @@ service cloud.firestore {
 
     function isParent() {
       return signedIn()
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email_verified == true
         && request.auth.token.email is string
         && request.auth.token.email.lower() in [
           'brookhouser@gmail.com',

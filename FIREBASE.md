@@ -11,6 +11,10 @@ Kids, including Wally, do not use Google. A parent creates a bay from the dock (
 
 Progress, the turtle, coins, and lesson history live in Firestore at `families/{familyId}/kids/{uid}`. The family id comes from `VITE_FAMILY_ID` and defaults to `turtlebay`. Both parents share that family.
 
+## Demo progress import
+
+The first time a kid signs in or starts a synced bay on a browser that still has demo progress in `localStorage`, the app copies that turtle, coins, accessories, lessons, and lesson history into the new bay. It only does this when the synced bay has no progress yet. It picks the demo bay with the same name, or else the demo bay with the most progress. The demo save stays on the device as a backup, and the flag `turtlebay.imported.v1` stops a second import.
+
 ## Env vars
 
 Copy `.env.example` to `.env.local`. Do not commit `.env.local`.
@@ -30,7 +34,7 @@ Also read by the app, and worth pasting from the same web app config:
 - `VITE_FAMILY_ID` (default `turtlebay`)
 - `VITE_FORCE_DEMO`
 
-No project id or API key is committed. Kevin pastes the real web app config.
+The real web app config for `turtle-bay-wally` is committed in `.env.production`, so `npm run build` makes a synced build. Web API keys are public by design. Firestore rules and the Auth authorized domains list are what protect the data. `.env.local` still overrides it for local work.
 
 ## Security rules
 
@@ -41,7 +45,7 @@ No project id or API key is committed. Kevin pastes the real web app config.
 - A kid cannot list other kids and cannot delete.
 - Everything else is denied.
 
-The rules check the Google email on the ID token. They do not use custom claims. Coin totals are still written by the client. That is fine for this family app. Move awards into Cloud Functions before a public launch.
+A parent must sign in with Google (`sign_in_provider == 'google.com'`) and Google must mark the email verified. Email/Password is on for kid bays, so a password account that only claims a parent address is not a parent. The app makes the same check before it opens the parent dock. The rules do not use custom claims. Coin totals are still written by the client. That is fine for this family app. Move awards into Cloud Functions before a public launch.
 
 ## Hosting
 
@@ -50,9 +54,9 @@ The rules check the Google email on the ID token. They do not use custom claims.
 - `npm run build` writes a GitHub Pages build whose asset URLs start with `/turtle-bay/`.
 - `npm run build:hosting` writes a Firebase Hosting build at the site root (`vite build --base /`). Hosting runs this before deploy.
 
-GitHub Pages keeps working from the `docs/` folder, which is a copy of the current live site (including `public/sprites` twins under `docs/sprites/`). In the GitHub repo, set Settings, Pages, Branch `main`, folder `/docs` before merging this branch if the Chromebook link must stay up. Root `index.html` on this branch is the Vite source entry, not the Pages bundle. Firebase Hosting can go live later without turning Pages off first.
+GitHub Pages serves Branch `main`, folder `/docs`. `docs/` is the output of `npm run build` plus `.nojekyll` and the `404.html` deep link helper. To publish a new build: `npm run build`, replace `docs/` with `dist/` (keep `docs/404.html` and `docs/.nojekyll`), commit, and push `main`. Root `index.html` is the Vite source entry, not the Pages bundle. Firebase Hosting can go live later without turning Pages off first.
 
-There is no `.firebaserc`. After the project exists, run `firebase use --add` and pick it. Do not commit a guessed project id.
+`.firebaserc` points the default project at `turtle-bay-wally`.
 
 ## Kevin checklist
 

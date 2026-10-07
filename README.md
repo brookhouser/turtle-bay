@@ -13,19 +13,19 @@ npm run dev
 
 Open [http://127.0.0.1:43127](http://127.0.0.1:43127).
 
-Demo mode is the default. You do not need a Firebase project to play.
+`npm run dev` stays in Demo mode unless `.env.local` has Firebase keys. You do not need a Firebase project to play locally.
 
 ```bash
 npm test
 npm run build
 ```
 
-## Hosted demo (GitHub Pages)
+## Hosted site (GitHub Pages)
 
-`npm run build` writes `dist/` for a project site at `/turtle-bay/`. No Firebase keys are baked in, so that build stays in Demo mode.
+`npm run build` writes `dist/` for a project site at `/turtle-bay/`. It reads `.env.production`, which holds the public `turtle-bay-wally` web config, so the hosted build is a Synced bay.
 
 1. Build with `npm run build`.
-2. Publish the contents of `dist/` to GitHub Pages for a repository named `turtle-bay` (user site path `https://<user>.github.io/turtle-bay/`).
+2. Replace `docs/` with `dist/` (keep `docs/.nojekyll`), commit, and push `main`. Pages serves Branch `main`, folder `/docs`, at `https://brookhouser.github.io/turtle-bay/`.
 3. Open that `/turtle-bay/` URL on a Chromebook. `404.html` sends refreshed routes such as `/turtle-bay/home` back into the app.
 
 Serve the same folder locally with any static host whose root contains a `turtle-bay` directory, then open `/turtle-bay/`. A `file://` open of `index.html` will not load the scripts, because the build asks for `/turtle-bay/assets/...`.
@@ -88,9 +88,9 @@ Meters ease down over time while the bay is closed, so coming back to feed and c
 
 ## Firebase
 
-Copy `.env.example` to `.env.local`. Leave the Firebase fields blank to keep demo mode. Do not commit `.env.local`. The parent list is already set to Kevin and Beth. Step by step setup, security rules, and Hosting are in `FIREBASE.md`.
+For local work, copy `.env.example` to `.env.local`. Leave the Firebase fields blank to keep demo mode. Do not commit `.env.local`. The parent list is already set to Kevin and Beth. Step by step setup, security rules, and Hosting are in `FIREBASE.md`.
 
-`npm run build` is the GitHub Pages build (`/turtle-bay/`). `npm run build:hosting` is the Firebase Hosting build (site root). GitHub Pages keeps serving the current site from `docs/` once the Pages folder is set to `/docs`. Until that switch, do not treat a merge of this source as the live Chromebook build.
+`npm run build` is the GitHub Pages build (`/turtle-bay/`). `npm run build:hosting` is the Firebase Hosting build (site root). GitHub Pages serves `main` `/docs`, the committed output of `npm run build`.
 
 Kid logins do not use Google. The app creates an email/password user at `{bayname}@kid.turtlebay.app` with the PIN as the password. Firebase asks for at least 6 characters, so a connected bay needs a PIN of 6 to 12 letters or numbers. Demo mode allows 4 to 12.
 

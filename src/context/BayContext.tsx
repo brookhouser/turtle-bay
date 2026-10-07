@@ -19,6 +19,7 @@ import {
 import { firebaseMode, getAllowlist } from '../lib/env'
 import type { FirebaseApi } from './firebaseApi'
 import { BayContext } from './useBay'
+import { markDemoImported, withDemoProgress } from '../lib/demoImport'
 import { hashPin } from '../lib/pin'
 import { loadSave, loadSession, persistSave, persistSession } from '../lib/storage'
 import type {
@@ -186,7 +187,7 @@ export function BayProvider({ children }: { children: ReactNode }) {
               setReady(true)
               return
             }
-            if (!allowlist.includes(email)) {
+            if (!allowlist.includes(email) || !(await fb.isParentUser(user))) {
               await fb.signOutBay()
               setBootError('That Google account is not on the parent list.')
               setSession(null)
@@ -233,6 +234,20 @@ export function BayProvider({ children }: { children: ReactNode }) {
     return () => window.clearInterval(id)
   }, [activeKidId])
 
+  // First synced sign in on a browser that has demo progress: carry the turtle over once.
+  async function importDemo(fb: FirebaseApi, cloud: KidProfile): Promise<KidProfile> {
+    const found = withDemoProgress(cloud)
+    if (!found) return cloud
+    try {
+      await fb.saveKid(found.kid)
+      markDemoImported(found.demoId, cloud.id)
+      pushToast('Your turtle came along from demo mode.')
+      return found.kid
+    } catch {
+      return cloud
+    }
+  }
+
   async function signUpKid(nickname: string, pin: string): Promise<string | null> {
     const nameError = validateNickname(nickname)
     if (nameError) return nameError
@@ -242,7 +257,8 @@ export function BayProvider({ children }: { children: ReactNode }) {
       try {
         const fb = fbRef.current ?? (await loadFirebase())
         fbRef.current = fb
-        const created = await fb.signUpKid(nickname, pin)
+        const fresh = await fb.signUpKid(nickname, pin)
+        const created = await importDemo(fb, fresh)
         setSave({ kids: [created] })
         setSession({ role: 'kid', kidId: created.id })
         return null
@@ -271,7 +287,7 @@ export function BayProvider({ children }: { children: ReactNode }) {
       try {
         const fb = fbRef.current ?? (await loadFirebase())
         fbRef.current = fb
-        const loaded = await fb.signInKid(nickname, pin)
+        const loaded = await importDemo(fb, await fb.signInKid(nickname, pin))
         const nextKid = { ...loaded, turtle: applyDecay(loaded.turtle) }
         setSave({ kids: [nextKid] })
         setSession({ role: 'kid', kidId: nextKid.id })
