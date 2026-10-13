@@ -3,13 +3,23 @@ import { PASS_ACCURACY } from '../config'
 import { useBay } from '../context/useBay'
 import { LESSONS } from '../data/curriculum'
 import { prettyKey } from '../data/keyboard'
+import { spellingListFromChallenge, WEEKLY_SPELLING } from '../data/spelling'
 import { LockIcon } from '../components/Icons'
 
 export function ChallengesPage() {
   const { kid } = useBay()
   if (!kid) return null
   const typingCustom = kid.customChallenges.filter((challenge) => challenge.type === 'typing')
-  const later = kid.customChallenges.filter((challenge) => challenge.type !== 'typing')
+  const spellingCustom = kid.customChallenges.flatMap((challenge) => {
+    if (challenge.type !== 'spelling') return []
+    const list = spellingListFromChallenge(challenge)
+    return list ? [{ challenge, list }] : []
+  })
+  const later = kid.customChallenges.filter((challenge) => {
+    if (challenge.type === 'typing') return false
+    if (challenge.type === 'spelling' && spellingListFromChallenge(challenge)) return false
+    return true
+  })
 
   return (
     <div className="stack-page">
@@ -55,11 +65,12 @@ export function ChallengesPage() {
             </article>
           )
         })}
-        <article className="lesson-card is-locked">
+        <article className="lesson-card">
           <p className="eyebrow">Spelling</p>
           <h2>Word bay</h2>
-          <p>Spelling drills will land here later.</p>
-          <p className="lock-line"><LockIcon /> Locked</p>
+          <p>{WEEKLY_SPELLING.sortLabel}. Find the letters, then spell them to stack a crabby patty.</p>
+          <p className="fine">{WEEKLY_SPELLING.words.length} words</p>
+          <Link className="btn btn-primary" to="/spelling">Play</Link>
         </article>
         <article className="lesson-card is-locked">
           <p className="eyebrow">Math</p>
@@ -69,7 +80,7 @@ export function ChallengesPage() {
         </article>
       </div>
 
-      {typingCustom.length > 0 ? (
+      {typingCustom.length > 0 || spellingCustom.length > 0 ? (
         <section>
           <h2>From the parent dock</h2>
           <div className="lesson-grid">
@@ -79,6 +90,14 @@ export function ChallengesPage() {
                 <h2>{challenge.title}</h2>
                 <p className="fine">{challenge.coinReward} coins</p>
                 <Link className="btn btn-primary" to={`/custom/${challenge.id}`}>Play</Link>
+              </article>
+            ))}
+            {spellingCustom.map(({ challenge, list }) => (
+              <article key={challenge.id} className="lesson-card">
+                <p className="eyebrow">Spelling</p>
+                <h2>{challenge.title}</h2>
+                <p className="fine">{list.words.length} words · {challenge.coinReward} coins</p>
+                <Link className="btn btn-primary" to={`/spelling/${challenge.id}`}>Play</Link>
               </article>
             ))}
           </div>
@@ -93,7 +112,12 @@ export function ChallengesPage() {
               <article key={challenge.id} className="lesson-card is-locked">
                 <p className="eyebrow">{challenge.type === 'math' ? 'Math' : 'Spelling'}</p>
                 <h2>{challenge.title}</h2>
-                <p className="lock-line"><LockIcon /> Stored. The player for this is not built yet.</p>
+                <p className="lock-line">
+                  <LockIcon />{' '}
+                  {challenge.type === 'spelling'
+                    ? 'Add one word per line, with a sentence after a bar, to play it.'
+                    : 'Stored. The player for this is not built yet.'}
+                </p>
               </article>
             ))}
           </div>

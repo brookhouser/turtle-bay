@@ -5,6 +5,7 @@ import { useBay } from '../context/useBay'
 import { LESSONS } from '../data/curriculum'
 import { findItem } from '../data/catalog'
 import { formatWhen } from '../lib/format'
+import { parseSpellingPrompt } from '../data/spelling'
 import { parseFocusKeys, practiceStreak } from '../game/logic'
 import { Meters } from '../components/Meters'
 import { Turtle } from '../components/Turtle'
@@ -56,10 +57,17 @@ export function ParentPage() {
     })
     setError(message)
     if (!message) {
+      const spellingWords = type === 'spelling' ? parseSpellingPrompt(prompt) : []
       setTitle('')
       setPrompt('')
       setFocus('')
-      pushToast(type === 'typing' ? 'Typing drill added to the challenge board.' : 'Placeholder saved. It stays locked in the kid view.')
+      pushToast(
+        type === 'typing'
+          ? 'Typing drill added to the challenge board.'
+          : spellingWords.length > 0
+            ? 'Spelling list added to the challenge board.'
+            : 'Placeholder saved. It stays locked in the kid view.',
+      )
     }
   }
 
@@ -104,7 +112,7 @@ export function ParentPage() {
 
         <section className="panel">
           <h2>Add a challenge</h2>
-          <p>Typing drills show up on the challenge board right away. Spelling and math are saved as locked placeholders.</p>
+          <p>Typing drills show up right away. A spelling list is one word per line, with a sentence after a bar. A short note stays locked.</p>
           <form className="stack" onSubmit={onAddChallenge}>
             <label className="field">
               Kid bay
@@ -127,8 +135,15 @@ export function ParentPage() {
               <input className="bay-input" value={title} onChange={(event) => setTitle(event.target.value)} maxLength={40} required />
             </label>
             <label className="field">
-              {type === 'typing' ? 'Text to type' : 'Note for later'}
-              <textarea className="bay-input bay-area" value={prompt} onChange={(event) => setPrompt(event.target.value)} maxLength={280} required />
+              {type === 'typing' ? 'Text to type' : type === 'spelling' ? 'Word list or note' : 'Note for later'}
+              <textarea
+                className="bay-input bay-area"
+                value={prompt}
+                onChange={(event) => setPrompt(event.target.value)}
+                maxLength={type === 'spelling' ? 1200 : 280}
+                placeholder={type === 'spelling' ? 'bacon | Crispy bacon smells like breakfast.' : undefined}
+                required
+              />
             </label>
             {type === 'typing' ? (
               <label className="field">
@@ -236,9 +251,39 @@ function KidCard({ kid }: { kid: KidProfile }) {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
         )}
       </div>
+      {kid.spellingSessions.length > 0 ? (
+        <div className="table-wrap">
+          <h3>Spelling</h3>
+          <table>
+            <caption className="sr-only">Spelling sessions for {kid.nickname}</caption>
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>List</th>
+                <th>Correct</th>
+                <th>Missed</th>
+                <th>Points</th>
+                <th>Coins</th>
+              </tr>
+            </thead>
+            <tbody>
+              {kid.spellingSessions.slice(0, 12).map((session) => (
+                <tr key={session.id}>
+                  <td>{formatWhen(session.date)}</td>
+                  <td>{session.listTitle}{session.finished ? '' : ' (partial)'}</td>
+                  <td>{session.correctWords.length > 0 ? session.correctWords.join(', ') : 'None'}</td>
+                  <td>{session.missedWords.length > 0 ? session.missedWords.join(', ') : 'None'}</td>
+                  <td>{session.points}</td>
+                  <td>{session.coins}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
     </article>
   )
 }

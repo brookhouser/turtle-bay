@@ -71,7 +71,11 @@ Eight lessons start on the home row and then reach for new keys:
 
 The lesson screen shows a full QWERTY keyboard, home row bumps on F and J, and which finger to use. Caps Lock is fine on lowercase lessons. Accuracy of 85% opens the next lesson. Missed keys can be practiced from the results screen or from Tricky keys on the challenge card.
 
-Spelling and math are locked cards. A parent can save a placeholder for them, or add a playable typing drill, from the parent dock. New typing drills use the same lesson screen. You do not have to rewrite the app to add one.
+Word bay is the spelling challenge. This week's words live in `src/data/spelling.ts` (`WEEKLY_SPELLING`). Swap that list for next week. Each word needs the spelling and a short sentence.
+
+Round 1, Find the letters, shows the word and lights one key at a time. Round 2, Spell it, hides the word, says the word, a sentence, and the word again, then asks him to type it. A miss shows the spelling for a moment and asks again later. Each correct round 2 word adds a layer to a crabby patty. Feed Pebble plays the eating pose and adds coins plus a little hunger and happy.
+
+A parent can save a playable spelling list from the dock: one word per line, with a sentence after a bar (`bacon | Crispy bacon smells like breakfast.`). A short note with no word list stays locked. Math is still a locked card. New typing drills use the same lesson screen.
 
 ## Habitats and shop
 
@@ -96,7 +100,7 @@ Kid logins do not use Google. The app creates an email/password user at `{baynam
 
 Parents use Google sign in. Only the allowlist can open the dock. Both parents share one family id (`VITE_FAMILY_ID`, default `turtlebay`). Kid profiles live at `families/{familyId}/kids/{uid}`.
 
-What is saved: turtle name, meters, coins, owned and equipped items, habitat tier, lesson progress, custom challenges, and session history (date, WPM, accuracy, coins, tricky keys).
+What is saved: turtle name, meters, coins, owned and equipped items, habitat tier, lesson progress, custom challenges, typing session history (date, WPM, accuracy, coins, tricky keys), and spelling sessions (correct words, missed words, points, coins).
 
 Client rules are a scaffold. A kid who can use the browser console could edit their own document. That is enough for a family demo. Move coin awards into Cloud Functions before a public launch.
 

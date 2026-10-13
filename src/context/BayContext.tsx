@@ -9,7 +9,9 @@ import {
   equipItem as equipItemForKid,
   feedTurtle as feedTurtleForKid,
   normalizeKid,
+  feedSpellingPatty,
   petTurtle as petTurtleForKid,
+  recordSpellingSession,
   renameTurtle as renameTurtleForKid,
   unequipItem as unequipItemForKid,
   upgradeHabitat as upgradeHabitatForKid,
@@ -29,6 +31,7 @@ import type {
   LessonSummary,
   SaveData,
   SessionData,
+  SpellingSessionInput,
 } from '../types'
 
 export type BayContextValue = {
@@ -54,6 +57,8 @@ export type BayContextValue = {
   unequipItem: (itemId: string) => string | null
   upgradeHabitat: () => string | null
   recordLesson: (input: LessonInput) => LessonSummary | null
+  recordSpelling: (input: SpellingSessionInput) => string | null
+  feedPatty: (sessionId: string) => string | null
   addChallenge: (kidId: string, draft: ChallengeDraft) => string | null
   clearDemoKids: () => void
   pushToast: (message: string) => void
@@ -389,6 +394,18 @@ export function BayProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  function recordSpelling(input: SpellingSessionInput): string | null {
+    const current = kidRef.current
+    if (!current) return null
+    const applied = recordSpellingSession(current, input)
+    writeKid(applied.kid)
+    return applied.sessionId
+  }
+
+  function feedPatty(sessionId: string): string | null {
+    return mutate((current) => feedSpellingPatty(current, sessionId))
+  }
+
   function addChallenge(kidId: string, draft: ChallengeDraft): string | null {
     const current = save.kids.find((entry) => entry.id === kidId)
     if (!current) return 'Pick a kid bay first.'
@@ -426,6 +443,8 @@ export function BayProvider({ children }: { children: ReactNode }) {
     unequipItem: (itemId) => mutate((current) => unequipItemForKid(current, itemId)),
     upgradeHabitat: () => mutate((current) => upgradeHabitatForKid(current)),
     recordLesson,
+    recordSpelling,
+    feedPatty,
     addChallenge,
     clearDemoKids,
     pushToast,

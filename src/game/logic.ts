@@ -12,6 +12,9 @@ import {
   PET_HAPPY_GAIN,
   REMATCH_PASS_COINS,
   REMATCH_TRY_COINS,
+  SPELLING_FEED_COINS,
+  SPELLING_FEED_HAPPY,
+  SPELLING_FEED_HUNGER,
 } from '../config'
 import { currentItemId, findItem, HABITATS } from '../data/catalog'
 import { LESSONS, nextLesson } from '../data/curriculum'
@@ -23,6 +26,8 @@ import type {
   KidProfile,
   LessonInput,
   LessonProgress,
+  SpellingSession,
+  SpellingSessionInput,
   TurtleState,
   TypingSession,
 } from '../types'
@@ -87,6 +92,7 @@ export function createKid(nickname: string, pinHash: string, id: string = crypto
     },
     lessons: blankLessons(),
     sessions: [],
+    spellingSessions: [],
     customChallenges: [],
     practiceDays: [],
     createdAt: new Date(now).toISOString(),
@@ -145,6 +151,7 @@ export function normalizeKid(input: Partial<KidProfile> & { id: string; nickname
     turtle,
     lessons,
     sessions: Array.isArray(input.sessions) ? input.sessions.slice(0, 40) : [],
+    spellingSessions: asSpellingSessions(input.spellingSessions),
     customChallenges: Array.isArray(input.customChallenges) ? input.customChallenges : [],
     practiceDays: Array.isArray(input.practiceDays) ? input.practiceDays : [],
     createdAt: input.createdAt ?? fresh.createdAt,
@@ -429,6 +436,10 @@ export function addChallenge(kid: KidProfile, draft: ChallengeDraft, now = Date.
   if (title.length < 3 || title.length > 40) return { kid, error: 'Title needs 3 to 40 characters.' }
   if (draft.type === 'typing') {
     if (prompt.length < 8 || prompt.length > 280) return { kid, error: 'Typing text needs 8 to 280 characters.' }
+  } else if (draft.type === 'spelling') {
+    if (prompt.length < 3 || prompt.length > 1200) {
+      return { kid, error: 'Add a short note, or one word per line with a sentence after a bar.' }
+    }
   } else if (prompt.length < 3 || prompt.length > 280) {
     return { kid, error: 'Add a short note so this placeholder is easy to find later.' }
   }
@@ -446,6 +457,93 @@ export function addChallenge(kid: KidProfile, draft: ChallengeDraft, now = Date.
     createdAt: new Date(now).toISOString(),
   }
   return { kid: { ...kid, customChallenges: [challenge, ...kid.customChallenges] } }
+}
+
+function wholeNumber(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0
+}
+
+function asSpellingSessions(value: unknown): SpellingSession[] {
+  if (!Array.isArray(value)) return []
+  const sessions: SpellingSession[] = []
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') continue
+    const raw = entry as Partial<SpellingSession>
+    if (typeof raw.id !== 'string' || typeof raw.listTitle !== 'string') continue
+    sessions.push({
+      id: raw.id,
+      listId: typeof raw.listId === 'string' ? raw.listId : 'spelling',
+      listTitle: raw.listTitle,
+      date: typeof raw.date === 'string' ? raw.date : new Date(0).toISOString(),
+      correctWords: Array.isArray(raw.correctWords) ? raw.correctWords.filter((word) => typeof word === 'string') : [],
+      missedWords: Array.isArray(raw.missedWords) ? raw.missedWords.filter((word) => typeof word === 'string') : [],
+      points: wholeNumber(raw.points),
+      bestStreak: wholeNumber(raw.bestStreak),
+      reward: wholeNumber(raw.reward),
+      coins: wholeNumber(raw.coins),
+      finished: Boolean(raw.finished),
+    })
+  }
+  return sessions.slice(0, 40)
+}
+
+export function recordSpellingSession(
+  kid: KidProfile,
+  input: SpellingSessionInput,
+  now = Date.now(),
+): { kid: KidProfile; sessionId: string } {
+  const sessionId = crypto.randomUUID()
+  const session: SpellingSession = {
+    id: sessionId,
+    listId: input.listId,
+    listTitle: input.listTitle,
+    date: new Date(now).toISOString(),
+    correctWords: [...input.correctWords],
+    missedWords: [...input.missedWords],
+    points: Math.max(0, Math.round(input.points)),
+    bestStreak: Math.max(0, Math.round(input.bestStreak)),
+    reward: Math.max(0, Math.round(input.reward)),
+    coins: 0,
+    finished: input.finished,
+  }
+  const day = localDay(new Date(now))
+  const practiceDays = kid.practiceDays.includes(day) ? kid.practiceDays : [...kid.practiceDays, day]
+  return {
+    sessionId,
+    kid: {
+      ...kid,
+      practiceDays,
+      spellingSessions: [session, ...kid.spellingSessions].slice(0, 40),
+    },
+  }
+}
+
+export function feedSpellingPatty(
+  kid: KidProfile,
+  sessionId: string,
+  now = Date.now(),
+): { kid: KidProfile; error?: string } {
+  const target = kid.spellingSessions.find((session) => session.id === sessionId)
+  if (!target) return { kid, error: 'Finish the spelling list first.' }
+  if (!target.finished) return { kid, error: 'Finish the word list first.' }
+  if (target.coins > 0) return { kid, error: 'Pebble already ate that patty.' }
+  const bonus = target.reward > 0 ? target.reward : SPELLING_FEED_COINS
+  const decayed = applyDecay(kid.turtle, now)
+  return {
+    kid: {
+      ...kid,
+      spellingSessions: kid.spellingSessions.map((session) =>
+        session.id === sessionId ? { ...session, coins: bonus } : session,
+      ),
+      turtle: {
+        ...decayed,
+        coins: decayed.coins + bonus,
+        hunger: clampMeter(decayed.hunger + SPELLING_FEED_HUNGER),
+        happy: clampMeter(decayed.happy + SPELLING_FEED_HAPPY),
+        lastTick: now,
+      },
+    },
+  }
 }
 
 export function practiceStreak(days: string[], today = localDay()): number {

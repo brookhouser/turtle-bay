@@ -78,6 +78,31 @@ export type TypingSession = {
   missedKeys: string[]
 }
 
+export type SpellingSession = {
+  id: string
+  listId: string
+  listTitle: string
+  date: string
+  correctWords: string[]
+  missedWords: string[]
+  points: number
+  bestStreak: number
+  reward: number
+  coins: number
+  finished: boolean
+}
+
+export type SpellingSessionInput = {
+  listId: string
+  listTitle: string
+  correctWords: string[]
+  missedWords: string[]
+  points: number
+  bestStreak: number
+  reward: number
+  finished: boolean
+}
+
 export type CustomChallenge = {
   id: string
   type: ChallengeType
@@ -95,6 +120,7 @@ export type KidProfile = {
   turtle: TurtleState
   lessons: Record<string, LessonProgress>
   sessions: TypingSession[]
+  spellingSessions: SpellingSession[]
   customChallenges: CustomChallenge[]
   practiceDays: string[]
   createdAt: string

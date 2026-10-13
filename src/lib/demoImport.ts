@@ -7,7 +7,13 @@ import type { KidProfile } from '../types'
 const IMPORT_FLAG = 'turtlebay.imported.v1'
 
 function progressScore(kid: KidProfile): number {
-  return kid.sessions.length * 1000 + kid.turtle.coins + Object.keys(kid.turtle.inventory).length + (kid.turtle.named ? 1 : 0)
+  return (
+    kid.sessions.length * 1000 +
+    kid.spellingSessions.length * 1000 +
+    kid.turtle.coins +
+    Object.keys(kid.turtle.inventory).length +
+    (kid.turtle.named ? 1 : 0)
+  )
 }
 
 function isFresh(kid: KidProfile): boolean {
@@ -49,6 +55,7 @@ export function withDemoProgress(cloud: KidProfile): { kid: KidProfile; demoId: 
       turtle: match.turtle,
       lessons: match.lessons,
       sessions: match.sessions,
+      spellingSessions: match.spellingSessions,
       customChallenges: match.customChallenges,
       practiceDays: match.practiceDays,
     },

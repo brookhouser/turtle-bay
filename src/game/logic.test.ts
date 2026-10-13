@@ -13,8 +13,10 @@ import {
   coinsForRun,
   createKid,
   equipItem,
+  feedSpellingPatty,
   feedTurtle,
   practiceStreak,
+  recordSpellingSession,
   renameTurtle,
   upgradeHabitat,
   validateNickname,
@@ -159,6 +161,44 @@ describe('names and parent challenges', () => {
       coinReward: 20,
     })
     expect(spelling.kid.customChallenges.map((challenge) => challenge.type)).toEqual(['spelling', 'typing'])
+  })
+
+  it('saves spelling words and lets Pebble eat the patty once', () => {
+    const kid = createKid('pebble', 'hash', 'kid-1', 1_700_000_000_000)
+    const saved = recordSpellingSession(kid, {
+      listId: 'sort-34',
+      listTitle: 'Sort 34',
+      correctWords: ['bargain', 'pardon'],
+      missedWords: ['bacon'],
+      points: 22,
+      bestStreak: 2,
+      reward: 10,
+      finished: true,
+    })
+    expect(saved.kid.spellingSessions[0].correctWords).toEqual(['bargain', 'pardon'])
+    expect(saved.kid.spellingSessions[0].missedWords).toEqual(['bacon'])
+    expect(saved.kid.spellingSessions[0].coins).toBe(0)
+    const fed = feedSpellingPatty(saved.kid, saved.sessionId, 1_700_000_000_000)
+    expect(fed.error).toBeUndefined()
+    expect(fed.kid.turtle.coins).toBe(10)
+    expect(fed.kid.turtle.hunger).toBeGreaterThan(kid.turtle.hunger)
+    expect(fed.kid.turtle.happy).toBeGreaterThan(kid.turtle.happy)
+    expect(fed.kid.spellingSessions[0].coins).toBe(10)
+    expect(feedSpellingPatty(fed.kid, saved.sessionId).error).toBeTruthy()
+  })
+
+  it('accepts a long spelling list from the parent dock', () => {
+    const kid = createKid('pebble', 'hash', 'kid-1')
+    const prompt = ['bacon | Crispy bacon smells like breakfast.', 'toast | Toast is warm.'].join('\n')
+    const added = addChallenge(kid, {
+      type: 'spelling',
+      title: 'Sort 35',
+      prompt,
+      focusKeys: [],
+      coinReward: 15,
+    })
+    expect(added.error).toBeUndefined()
+    expect(added.kid.customChallenges[0].prompt).toContain('bacon')
   })
 
   it('builds a rematch from missed keys and counts a practice streak', () => {

@@ -93,6 +93,13 @@ export function fingerFor(key: string): FingerId | null {
   return fingerByKey[key.toLowerCase()] ?? null
 }
 
+// One key, exact match. A chunk like "fl" must not light F and L together,
+// and a single letter must not light Shift or Caps Lock via a substring check.
+export function isExactKey(keyCode: string, nextKey: string | null | undefined): boolean {
+  if (nextKey == null || [...nextKey].length !== 1) return false
+  return keyCode.toLowerCase() === nextKey.toLowerCase()
+}
+
 export function prettyKey(key: string): string {
   if (key === ' ') return 'Space'
   if (key === ';') return ';'

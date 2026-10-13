@@ -19,6 +19,21 @@ function demoWally() {
   kid.sessions = [
     { id: 's1', lessonId: 'l1', lessonTitle: 'Home row', date: '2026-10-01', wpm: 12, accuracy: 90, coins: 10, streak: 3, missedKeys: [] },
   ]
+  kid.spellingSessions = [
+    {
+      id: 'sp1',
+      listId: 'sort-34',
+      listTitle: 'Sort 34',
+      date: '2026-10-02',
+      correctWords: ['bacon'],
+      missedWords: ['organ'],
+      points: 10,
+      bestStreak: 1,
+      reward: 10,
+      coins: 10,
+      finished: true,
+    },
+  ]
   return kid
 }
 
@@ -34,6 +49,7 @@ describe('demo progress import', () => {
     expect(found?.kid.turtle.coins).toBe(42)
     expect(found?.kid.turtle.equipped.hat).toBe('bucket-hat')
     expect(found?.kid.sessions).toHaveLength(1)
+    expect(found?.kid.spellingSessions[0].missedWords).toEqual(['organ'])
     markDemoImported(found!.demoId, cloud.id)
     expect(withDemoProgress(cloud)).toBeNull()
   })

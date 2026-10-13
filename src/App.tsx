@@ -13,6 +13,7 @@ import { LoginPage } from './pages/LoginPage'
 import { NamePage } from './pages/NamePage'
 import { ParentPage } from './pages/ParentPage'
 import { ShopPage } from './pages/ShopPage'
+import { SpellingPage } from './pages/SpellingPage'
 import type { ReactNode } from 'react'
 
 function KidGate({ children, named = false }: { children: ReactNode; named?: boolean }) {
@@ -44,6 +45,8 @@ function RoutesView() {
       <Route path="/challenges" element={<KidGate named><AppShell><ChallengesPage /></AppShell></KidGate>} />
       <Route path="/lesson/:lessonId" element={<KidGate named><LessonPage /></KidGate>} />
       <Route path="/custom/:challengeId" element={<KidGate named><LessonPage /></KidGate>} />
+      <Route path="/spelling" element={<KidGate named><SpellingPage /></KidGate>} />
+      <Route path="/spelling/:challengeId" element={<KidGate named><SpellingPage /></KidGate>} />
       <Route path="/shop" element={<KidGate named><AppShell><ShopPage /></AppShell></KidGate>} />
       <Route path="/care" element={<KidGate named><AppShell><CarePage /></AppShell></KidGate>} />
       <Route path="/habitat" element={<KidGate named><AppShell><HabitatPage /></AppShell></KidGate>} />

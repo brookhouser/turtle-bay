@@ -610,6 +610,122 @@ th { font-size: 0.9rem; }
   max-width: min(520px, calc(100% - 24px));
 }
 
+.spelling-shell {
+  min-height: 100dvh;
+  padding: 8px 12px 12px;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+.spelling-shell .lesson-bar h1 { font-size: clamp(1.2rem, 2vw, 1.7rem); }
+.spelling-shell .live-stats { font-size: 1rem; }
+.round-label {
+  margin: 0;
+  font-weight: 800;
+  color: var(--teal-deep);
+}
+.spelling-layout, .spell-bridge, .spell-done-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 12px;
+  align-items: start;
+}
+.spell-bridge, .spell-done {
+  background: white;
+  border: 3px solid var(--ink);
+  border-radius: 24px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+.spell-bridge { align-items: center; }
+.spell-bridge h2, .spell-done h2 { margin: 0; }
+.spell-banner {
+  margin: 0;
+  background: #fff6d8;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  padding: 8px 14px;
+  font-weight: 800;
+  text-align: center;
+}
+.spell-banner.big {
+  background: #e7f8c9;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+.celebrate-stars { margin: 0; color: var(--gold); letter-spacing: 0.2em; font-size: 1.3rem; }
+.spelling-word {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 58px;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "calt" 0;
+  font-kerning: none;
+}
+.spelling-word .ch {
+  min-width: 0.62em;
+  text-align: center;
+  display: inline-block;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "calt" 0;
+}
+.spelling-word .spell-slot {
+  border-bottom-color: var(--ink);
+  color: var(--ink);
+}
+.spelling-word .spell-slot.current {
+  background: var(--thumb);
+  border-bottom-color: var(--teal-deep);
+}
+.spelling-shell .type-stage { gap: 6px; padding: 8px 10px; }
+.spelling-shell .key { min-height: 40px; font-size: 0.85rem; border-bottom-width: 4px; }
+.spelling-shell .hands { min-height: 58px; }
+.spelling-shell .digit { height: 48px; }
+.spelling-shell .digit.l-middle, .spelling-shell .digit.r-middle { height: 58px; }
+.spelling-shell .digit.l-ring, .spelling-shell .digit.r-ring { height: 54px; }
+.spelling-shell .digit.l-index, .spelling-shell .digit.r-index { height: 50px; }
+.patty-card {
+  background: linear-gradient(#fffdf8, #f6ead4);
+  border: 3px solid var(--ink);
+  border-radius: 24px;
+  padding: 6px 8px 10px;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+.patty-card.is-ready { box-shadow: 0 0 0 4px #f0c14a; }
+.patty-svg { width: min(100%, 220px); height: auto; max-height: min(460px, calc(100dvh - 140px)); }
+.patty-count { margin: 0; font-weight: 800; color: var(--teal); }
+.patty-label { margin: 0; font-weight: 700; text-align: center; }
+.patty-pop { animation: patty-pop 0.4s ease; }
+@keyframes patty-pop {
+  0% { opacity: 0; transform: translateY(8px) scale(0.92); }
+  100% { opacity: 1; transform: none; }
+}
+.spell-feed { display: grid; justify-items: center; align-content: center; gap: 8px; text-align: center; }
+.spell-feed .turtle-figure { height: auto; width: auto; }
+.spell-feed .turtle-sprite { width: min(210px, 42vw); height: auto; }
+.spell-done { padding: 10px 12px; gap: 8px; }
+.spell-done-grid { grid-template-columns: 176px minmax(0, 1fr); align-items: center; }
+.spell-done .patty-svg { width: 150px; max-height: none; }
+.spell-done .spell-banner.big h2 { font-size: 1.45rem; }
+.spell-done .key-list, .spell-done .button-row { justify-content: center; }
+
+@media (min-width: 1400px) and (min-height: 900px) {
+  .spelling-shell { padding: 12px 16px 16px; gap: 10px; }
+  .spelling-layout, .spell-bridge, .spell-done-grid { grid-template-columns: minmax(0, 1fr) 250px; }
+  .spelling-shell .key { min-height: 52px; font-size: 0.95rem; }
+  .spelling-word { min-height: 72px; }
+  .spell-done-grid { grid-template-columns: 250px minmax(0, 1fr); }
+  .spell-done .patty-svg { width: 220px; }
+  .spell-feed .turtle-sprite { width: min(280px, 40vw); }
+}
+
 @media (max-width: 1023px) {
   .laptop-note { display: block; }
   .login-card, .home-grid, .care-grid, .habitat-layout, .form-grid { grid-template-columns: 1fr; }

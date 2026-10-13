@@ -1,4 +1,4 @@
-import { fingerFor, KEYBOARD_ROWS, type FingerId } from '../data/keyboard'
+import { fingerFor, isExactKey, KEYBOARD_ROWS, type FingerId } from '../data/keyboard'
 
 export function Keyboard({
   nextKey,
@@ -18,7 +18,7 @@ export function Keyboard({
       {KEYBOARD_ROWS.map((row, rowIndex) => (
         <div className="key-row" key={rowIndex}>
           {row.map((key) => {
-            const isNext = nextKey != null && key.code.toLowerCase() === nextKey.toLowerCase()
+            const isNext = isExactKey(key.code, nextKey)
             const isKnown = key.code.length > 1 || known.has(key.code.toLowerCase()) || key.code === ' '
             const classes = [
               'key',
