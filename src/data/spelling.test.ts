@@ -2,13 +2,15 @@ import { describe, expect, it } from 'vitest'
 import { KEYBOARD_ROWS, isExactKey } from './keyboard'
 import { WEEKLY_SPELLING, parseSpellingPrompt, spellingListFromChallenge } from './spelling'
 import { PATTY_LAYERS, nextLetter, pointsForCorrect, requeueWord } from '../game/spelling'
-import { hiddenSentence } from '../lib/speech'
+import { hiddenSentence, spellingSpeechLines, spokenWord } from '../lib/speech'
 
-const WEEK = ['bargain', 'pardon', 'bacon', 'chosen', 'heaven', 'slogan', 'organ', 'mission', 'children', 'fountain']
+const WEEK = ['credit', 'habit', 'magnet', 'secret', 'pirate', 'ballet', 'private', 'quiet', 'senate', 'buffet']
 
 describe('weekly spelling list', () => {
-  it('is sort 34, one sentence each, ready for a parent to swap', () => {
-    expect(WEEKLY_SPELLING.id).toBe('sort-34')
+  it('is sort 35, one sentence each, ready for a parent to swap', () => {
+    expect(WEEKLY_SPELLING.id).toBe('sort-35')
+    expect(WEEKLY_SPELLING.title).toBe('Sort 35')
+    expect(WEEKLY_SPELLING.sortLabel).toBe('Sort 35')
     expect(WEEKLY_SPELLING.words.map((entry) => entry.word)).toEqual(WEEK)
     for (const entry of WEEKLY_SPELLING.words) {
       expect(entry.sentence.toLowerCase()).toContain(entry.word)
@@ -16,6 +18,29 @@ describe('weekly spelling list', () => {
       expect(entry.word).toBe(entry.word.toLowerCase())
     }
     expect(PATTY_LAYERS).toHaveLength(WEEKLY_SPELLING.words.length)
+    const unstarred = ['bandit', 'comet', 'orbit', 'planet', 'racket', 'limit', 'rocket', 'summit', 'target', 'unit', 'visit']
+    for (const word of unstarred) {
+      expect(WEEKLY_SPELLING.words.map((entry) => entry.word)).not.toContain(word)
+    }
+  })
+
+  it('says buffet as buh-FAY and leaves ballet and senate as spelled', () => {
+    expect(spokenWord('buffet')).toBe('bufay')
+    expect(spokenWord('ballet')).toBe('ballet')
+    expect(spokenWord('senate')).toBe('senate')
+    for (const entry of WEEKLY_SPELLING.words) {
+      const [first, sentence, last] = spellingSpeechLines(entry.word, entry.sentence)
+      expect(first).toBe(spokenWord(entry.word))
+      expect(last).toBe(first)
+      expect(sentence.toLowerCase()).toContain(first.toLowerCase())
+      if (entry.word !== 'buffet') expect(sentence).toBe(entry.sentence)
+    }
+    expect(spellingSpeechLines('buffet', 'We filled our plates at the buffet.')).toEqual([
+      'bufay',
+      'We filled our plates at the bufay.',
+      'bufay',
+    ])
+    expect(hiddenSentence('buffet', 'We filled our plates at the buffet.')).toBe('We filled our plates at the _____.')
   })
 
   it('parses a future parent list and leaves a note locked', () => {

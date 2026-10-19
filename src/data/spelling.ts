@@ -29,21 +29,21 @@ export type SpellingList = {
 const WORD_PATTERN = /^[a-zA-Z]{2,20}$/
 
 export const WEEKLY_SPELLING: SpellingList = {
-  id: 'sort-34',
-  title: 'Sort 34',
-  sortLabel: 'Sort 34',
+  id: 'sort-35',
+  title: 'Sort 35',
+  sortLabel: 'Sort 35',
   coinReward: SPELLING_FEED_COINS,
   words: [
-    { word: 'bargain', sentence: 'The hat was a bargain at the shop.' },
-    { word: 'pardon', sentence: 'Pardon me, I bumped your chair.' },
-    { word: 'bacon', sentence: 'Crispy bacon smells like breakfast.' },
-    { word: 'chosen', sentence: 'She was chosen to be line leader.' },
-    { word: 'heaven', sentence: 'The clouds looked like heaven.' },
-    { word: 'slogan', sentence: 'The class made a slogan for the book fair.' },
-    { word: 'organ', sentence: 'Your heart is an organ.' },
-    { word: 'mission', sentence: 'Our mission is to keep the bay clean.' },
-    { word: 'children', sentence: 'The children played tag at recess.' },
-    { word: 'fountain', sentence: 'Water jumped from the fountain.' },
+    { word: 'credit', sentence: 'Mom paid with a credit card.' },
+    { word: 'habit', sentence: 'Brushing your teeth is a good habit.' },
+    { word: 'magnet', sentence: 'The magnet stuck to the fridge.' },
+    { word: 'secret', sentence: 'The birthday plan is a secret.' },
+    { word: 'pirate', sentence: 'The pirate sailed across the bay.' },
+    { word: 'ballet', sentence: 'Mia has ballet class after school.' },
+    { word: 'private', sentence: 'That note is private.' },
+    { word: 'quiet', sentence: 'Please stay quiet at nap time.' },
+    { word: 'senate', sentence: 'The senate voted on a new law.' },
+    { word: 'buffet', sentence: 'We filled our plates at the buffet.' },
   ],
 }
 
