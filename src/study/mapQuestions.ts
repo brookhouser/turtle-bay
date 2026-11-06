@@ -1,11 +1,12 @@
 import type { StudyWord } from './content'
 import { makeQuestion, pickWord, type Question, type UnitStudy } from './engine'
-import { MIDDLE_EAST_UNIT, neighborsOf } from './mapUnit'
+import { MIDDLE_EAST_UNIT, neighborsOf, suggestedView } from './mapUnit'
+import { gradeCountry } from './meca'
 
 export type MapPrompt =
-  | { mode: 'tap'; countryId: string; name: string }
-  | { mode: 'choice'; countryId: string; name: string; choices: Array<{ id: string; label: string }> }
-  | { mode: 'type'; countryId: string; name: string }
+  | { mode: 'tap'; countryId: string; name: string; view: string }
+  | { mode: 'choice'; countryId: string; name: string; view: string; choices: Array<{ id: string; label: string }> }
+  | { mode: 'type'; countryId: string; name: string; view: string }
 
 function mulberry32(seed: number): () => number {
   let a = seed || 1
@@ -23,8 +24,9 @@ export function nextMapPrompt(progress: UnitStudy, recent: string[], seed: numbe
   const state = progress.words[word.id]
   const rand = mulberry32(seed + 17)
   const typed = zone === 'hard' || zone === 'legend' || (state?.meter ?? 0) >= 70
-  if (!typed && rand() < 0.55) return { mode: 'tap', countryId: word.id, name: word.term }
-  if (typed && rand() < 0.45) return { mode: 'type', countryId: word.id, name: word.term }
+  const view = suggestedView(word.id)
+  if (!typed && rand() < 0.55) return { mode: 'tap', countryId: word.id, name: word.term, view }
+  if (typed && rand() < 0.45) return { mode: 'type', countryId: word.id, name: word.term, view }
   const neighbors = neighborsOf(word.id)
   const base: Question = makeQuestion(
     { ...MIDDLE_EAST_UNIT, words: uniqueWords(word, neighbors) },
@@ -35,6 +37,7 @@ export function nextMapPrompt(progress: UnitStudy, recent: string[], seed: numbe
     mode: 'choice',
     countryId: word.id,
     name: word.term,
+    view,
     choices: base.choices.map((choice) => {
       const match = MIDDLE_EAST_UNIT.words.find((item) => item.id === choice.id)
       return { id: choice.id, label: match?.term ?? choice.label }
@@ -59,7 +62,6 @@ function uniqueWords(word: StudyWord, neighbors: StudyWord[]): StudyWord[] {
   return list
 }
 
-export function typedMatch(expected: string, typed: string): boolean {
-  const clean = (value: string) => value.trim().toLowerCase().replace(/[^a-z]/g, '')
-  return clean(expected) === clean(typed) && clean(typed).length > 0
+export function typedMatch(countryId: string, typed: string): { ok: boolean; hint: string } {
+  return gradeCountry(countryId, typed)
 }

@@ -1,0 +1,47 @@
+import { useEffect, useRef } from 'react'
+import { focusMap, MECA_GEOMETRY, MECA_MAP } from './meca'
+
+export function MecaMapBoard({
+  view,
+  highlightId,
+  onTap,
+}: {
+  view: string
+  highlightId: string | null
+  onTap: (id: string, quiz: boolean) => void
+}) {
+  const host = useRef<HTMLDivElement | null>(null)
+  const onTapRef = useRef(onTap)
+  onTapRef.current = onTap
+
+  useEffect(() => {
+    const parent = host.current
+    if (!parent) return
+    parent.replaceChildren()
+    const drawn = MECA_MAP.render(parent, MECA_GEOMETRY, { labels: true, width: 1100 })
+    focusMap(drawn.svg, view)
+    const zoom = MECA_MAP.attachPanZoom(drawn.wrap)
+    const onClick = (event: Event) => {
+      const mouse = event as MouseEvent
+      const hit = drawn.hit(mouse.clientX, mouse.clientY)
+      if (!hit?.properties?.id) return
+      onTapRef.current(hit.properties.id, Boolean(hit.properties.quiz))
+    }
+    drawn.svg.addEventListener('click', onClick)
+    return () => {
+      drawn.svg.removeEventListener('click', onClick)
+      zoom.destroy()
+      parent.replaceChildren()
+    }
+  }, [view])
+
+  useEffect(() => {
+    const svg = host.current?.querySelector('svg')
+    if (!svg) return
+    svg.querySelectorAll('.meca-selected').forEach((node) => node.classList.remove('meca-selected'))
+    if (!highlightId) return
+    svg.querySelectorAll(`[data-id="${highlightId}"]`).forEach((node) => node.classList.add('meca-selected'))
+  }, [highlightId, view])
+
+  return <div className="meca-host" ref={host} />
+}

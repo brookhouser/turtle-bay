@@ -1,51 +1,35 @@
-import type { StudyUnit, StudyWord } from './content'
-import mapData from './maps/middle-east.json'
+import type { StudyUnit } from './content'
+import countriesDoc from './maps/middle-east-central-asia/countries.json'
 
 export const MAP_UNIT_ID = 'middle-east'
 export const MAP_DUE = '2026-11-13'
 export const MAP_MASTERY_CREDITS = 4
 
-type MapCountry = {
+type CountryRecord = {
   id: string
   name: string
-  iso: string
-  small: boolean
-  label: [number, number]
-  rings: number[][][]
+  quiz?: boolean
+  small?: boolean
+  suggestedView?: string
+  borders?: string[]
+  aliases?: string[]
+  rejectAlone?: string[]
+  partialHint?: string
+  hook?: string
 }
 
-export type MapPack = {
-  license: string
-  note: string
-  countries: MapCountry[]
+type CountriesFile = {
+  meta: {
+    views: Record<string, { west: number; south: number; east: number; north: number }>
+  }
+  countries: CountryRecord[]
 }
 
-export const MIDDLE_EAST_MAP = mapData as MapPack
+export const COUNTRY_PACK = countriesDoc as CountriesFile
 
-const NEIGHBORS: Record<string, string[]> = {
-  yemen: ['oman', 'saudi-arabia'],
-  oman: ['yemen', 'united-arab-emirates', 'saudi-arabia'],
-  'saudi-arabia': ['yemen', 'oman', 'qatar', 'united-arab-emirates', 'kuwait', 'jordan', 'iraq'],
-  qatar: ['saudi-arabia', 'united-arab-emirates'],
-  'united-arab-emirates': ['oman', 'saudi-arabia', 'qatar'],
-  kuwait: ['saudi-arabia', 'iraq'],
-  jordan: ['saudi-arabia', 'israel', 'palestine', 'syria', 'iraq'],
-  israel: ['palestine', 'jordan', 'lebanon', 'syria'],
-  palestine: ['israel', 'jordan', 'lebanon'],
-  lebanon: ['syria', 'israel', 'palestine'],
-  syria: ['turkey', 'iraq', 'jordan', 'lebanon', 'israel'],
-  iraq: ['syria', 'turkey', 'iran', 'saudi-arabia', 'kuwait', 'jordan'],
-  iran: ['iraq', 'turkey', 'turkmenistan', 'azerbaijan', 'armenia'],
-  azerbaijan: ['armenia', 'iran', 'georgia', 'turkey'],
-  armenia: ['georgia', 'turkey', 'azerbaijan', 'iran'],
-  turkey: ['syria', 'iraq', 'iran', 'georgia', 'armenia', 'azerbaijan'],
-  georgia: ['turkey', 'armenia', 'azerbaijan'],
-  kyrgyzstan: ['kazakhstan', 'uzbekistan', 'tajikistan'],
-  turkmenistan: ['kazakhstan', 'uzbekistan', 'iran', 'tajikistan'],
-  tajikistan: ['kyrgyzstan', 'uzbekistan', 'turkmenistan'],
-  uzbekistan: ['kazakhstan', 'turkmenistan', 'tajikistan', 'kyrgyzstan'],
-  kazakhstan: ['uzbekistan', 'kyrgyzstan', 'turkmenistan'],
-}
+export const QUIZ_COUNTRIES = COUNTRY_PACK.countries.filter((country) => country.quiz)
+
+const quizIds = new Set(QUIZ_COUNTRIES.map((country) => country.id))
 
 export const MIDDLE_EAST_UNIT: StudyUnit = {
   id: MAP_UNIT_ID,
@@ -54,23 +38,32 @@ export const MIDDLE_EAST_UNIT: StudyUnit = {
   detail: '22 countries. Tap the map, then name the highlighted country.',
   href: '',
   due: MAP_DUE,
-  words: MIDDLE_EAST_MAP.countries.map((country) => ({
+  words: QUIZ_COUNTRIES.map((country) => ({
     id: country.id,
     term: country.name,
-    definition: `Find ${country.name} on the map.`,
+    definition: country.hook || `Find ${country.name} on the map.`,
     topic: 'map',
   })),
 }
 
-export function countryById(id: string): MapCountry | undefined {
-  return MIDDLE_EAST_MAP.countries.find((country) => country.id === id)
-}
-
-export function neighborsOf(id: string): StudyWord[] {
-  const ids = NEIGHBORS[id] ?? []
-  return ids
-    .map((item) => MIDDLE_EAST_UNIT.words.find((word) => word.id === item))
-    .filter((word): word is StudyWord => Boolean(word))
-}
-
 export const MAP_COUNTRY_NAMES = MIDDLE_EAST_UNIT.words.map((word) => word.term)
+
+export function countryRecord(id: string): CountryRecord | undefined {
+  return QUIZ_COUNTRIES.find((country) => country.id === id)
+}
+
+export function suggestedView(id: string): string {
+  return countryRecord(id)?.suggestedView || 'full'
+}
+
+export function viewBoxFor(name: string) {
+  return COUNTRY_PACK.meta.views[name] ?? COUNTRY_PACK.meta.views.full
+}
+
+export function neighborsOf(id: string) {
+  const borders = countryRecord(id)?.borders ?? []
+  return borders
+    .filter((border) => quizIds.has(border))
+    .map((border) => MIDDLE_EAST_UNIT.words.find((word) => word.id === border))
+    .filter((word): word is StudyUnit['words'][number] => Boolean(word))
+}

@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { useBay } from '../context/useBay'
 import { poseSrc } from '../fighter/sheet'
 import { ensureUnit } from '../study/engine'
 import type { ZoneId } from '../study/engine'
 import { chargeHero, freshHero, heroKit, inRange, knockback, noteMiss, strikePower, tickHero, duelStrike, type HeroRuntime, type SpecialId } from '../study/hero'
 import type { PoseId } from '../fighter/sheet'
-import { countryPaths, FULL_BOUNDS } from '../study/mapDraw'
+import { MecaMapBoard } from '../study/MecaMapBoard'
 import { nextMapPrompt, typedMatch, type MapPrompt } from '../study/mapQuestions'
 import { makeQuestion, pickWord, planWave, zoneOpen, type Question } from '../study/engine'
 import type { StudyUnit } from '../study/content'
@@ -64,7 +64,7 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
   heroRef.current = hero
   const poseNow: PoseId = hero.retreated ? 'retreat' : pose
   const duel = zone === 'legend'
-  const paths = useMemo(() => countryPaths(FULL_BOUNDS), [])
+  const mapView = mapPrompt?.view ?? 'full'
 
   function askNext(nextSeed: number, nextRecent: string[]) {
     if (unit.kind === 'map') setMapPrompt(nextMapPrompt(progress, nextRecent, nextSeed, zone))
@@ -163,8 +163,6 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
     setHero((current) => current.retreated ? current : { ...current, x, y })
   }
 
-  const activeId = unit.kind === 'map' ? mapPrompt?.countryId : wordQuestion?.wordId
-
   return (
     <div className="wave-wrap">
       <div className="zone-row" role="tablist" aria-label="Zones">
@@ -184,20 +182,18 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
         onPointerUp={() => { drag.current = null }}
       >
         {unit.kind === 'map' ? (
-          <svg className="wave-map" viewBox="0 0 1000 640" role="img" aria-label="Middle East and Central Asia">
-            {paths.map((shape) => (
-              <path
-                key={shape.id}
-                d={shape.d}
-                className={shape.id === activeId && mapPrompt?.mode !== 'tap' ? 'is-target' : ''}
-                onClick={() => {
-                  if (mapPrompt?.mode === 'tap') resolve(shape.id === mapPrompt.countryId, false)
-                }}
-              >
-                <title>{shape.name}</title>
-              </path>
-            ))}
-          </svg>
+          <MecaMapBoard
+            view={mapView}
+            highlightId={mapPrompt && mapPrompt.mode !== 'tap' ? mapPrompt.countryId : null}
+            onTap={(id, quiz) => {
+              if (mapPrompt?.mode !== 'tap') return
+              if (!quiz) {
+                setBanner('That country is on the map for context. It is not one of the 22.')
+                return
+              }
+              resolve(id === mapPrompt.countryId, false)
+            }}
+          />
         ) : null}
         <svg className="wave-lane" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           <polyline points={LANE.map((point) => `${point.x * 100},${point.y * 100}`).join(' ')} />
@@ -245,7 +241,12 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
             </>
           ) : null}
           {mapPrompt.mode === 'type' ? (
-            <form onSubmit={(event) => { event.preventDefault(); resolve(typedMatch(mapPrompt.name, typed), false) }}>
+            <form onSubmit={(event) => {
+              event.preventDefault()
+              const graded = typedMatch(mapPrompt.countryId, typed)
+              if (!graded.ok && graded.hint) setBanner(graded.hint)
+              resolve(graded.ok, false)
+            }}>
               <h2>Type the highlighted country</h2>
               <input className="bay-input" value={typed} onChange={(event) => setTyped(event.target.value)} aria-label="Country name" />
               <button className="btn btn-primary" type="submit">Check</button>
