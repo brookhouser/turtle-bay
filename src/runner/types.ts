@@ -9,13 +9,16 @@ export type RunnerAbility = {
   masteredAt: number
 }
 
+export type RunnerWorld = 'dojo' | 'beach' | 'reef' | 'volcano'
+
 export type RunnerCharacter = {
   id: string
   name: string
-  poses: { run: string; jump: string; dash: string }
+  poses: { run: string; jump: string; dash: string; glide?: string }
+  gear?: { hat?: string | null; scarf?: string | null }
 }
 
-export type Cell = '.' | 'G' | '^' | '#' | 'P' | 'Q' | 'W'
+export type Cell = '.' | 'G' | '^' | '#' | 'P' | 'Q' | 'W' | 'M' | 'S'
 
 export type RunnerLevel = {
   id: string
@@ -23,6 +26,7 @@ export type RunnerLevel = {
   name: string
   rows: string[]
   speed: number
+  world?: RunnerWorld
 }
 
 export type RunnerConfig = {
@@ -31,5 +35,6 @@ export type RunnerConfig = {
   gravity: number
   jump: number
   holdBoost: number
+  hearts: number
   levels: RunnerLevel[]
 }

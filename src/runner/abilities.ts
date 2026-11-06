@@ -30,16 +30,16 @@ export function masteredIds(units: StudyUnit[], study: StudyState): string[] {
   return ids
 }
 
-export function abilitiesUnlocked(masteredCount: number): RunnerAbility[] {
-  return RUNNER_ABILITIES.filter((ability) => masteredCount >= ability.masteredAt)
+export function abilitiesUnlocked(masteredCount: number, list: RunnerAbility[] = RUNNER_ABILITIES): RunnerAbility[] {
+  return list.filter((ability) => masteredCount >= ability.masteredAt)
 }
 
-export function hasAbility(masteredCount: number, id: RunnerAbilityId): boolean {
-  return abilitiesUnlocked(masteredCount).some((ability) => ability.id === id)
+export function hasAbility(masteredCount: number, id: RunnerAbilityId, list: RunnerAbility[] = RUNNER_ABILITIES): boolean {
+  return abilitiesUnlocked(masteredCount, list).some((ability) => ability.id === id)
 }
 
-export function nextAbility(masteredCount: number): RunnerAbility | null {
-  return RUNNER_ABILITIES.find((ability) => ability.masteredAt === masteredCount + 1) ?? null
+export function nextAbility(masteredCount: number, list: RunnerAbility[] = RUNNER_ABILITIES): RunnerAbility | null {
+  return list.find((ability) => ability.masteredAt === masteredCount + 1) ?? null
 }
 
 export function combinedProgress(units: StudyUnit[], study: StudyState): { unit: StudyUnit; progress: UnitStudy } {

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BASIC_CLEAN_COST, BASIC_FEED_COST } from '../config'
 import { useBay } from '../context/useBay'
 import { careHint } from '../game/logic'
@@ -121,6 +121,7 @@ export function HomePage() {
             </button>
           </div>
           <p className="hint" role="status">{message ?? careHint(turtle)}</p>
+          <p><Link className="btn btn-primary" to="/pebble-run">Pebble Run</Link></p>
         </section>
       </div>
       <TierPath current={turtle.habitatTier} onPick={(tier: HabitatTier) => navigate(`/habitat?pick=${tier}`)} />

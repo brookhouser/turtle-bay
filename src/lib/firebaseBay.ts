@@ -240,6 +240,7 @@ export async function persistDiff(prev: World, next: World, session: SessionData
         lessons: kid.lessons,
         sessions: kid.sessions,
         spellingSessions: kid.spellingSessions,
+        study: kid.study,
       }, { merge: true })
       continue
     }

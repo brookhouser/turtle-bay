@@ -2,9 +2,49 @@ import { Link } from 'react-router-dom'
 import { APP_NAME } from '../config'
 import { useBay } from '../context/useBay'
 import { parentPortal } from '../family/world'
-import { masteryRatio } from '../study/engine'
+import { blankUnit, masteryRatio, type ZoneId } from '../study/engine'
 import { hubUnits } from '../study/hub'
+import { pebbleUnits } from '../study/pebbleUnits'
+import type { StudyUnit } from '../study/content'
+import type { KidProfile } from '../types'
 import { DOJO_ACE } from '../fighter/looks'
+
+const ZONES: ZoneId[] = ['field', 'ridge', 'core', 'hard', 'legend']
+
+function MasteryBlock({ kid, units }: { kid: KidProfile; units: StudyUnit[] }) {
+  const { setStudyOverride } = useBay()
+  return (
+    <div className="stack">
+      {units.map((unit) => {
+        const progress = kid.study.units[unit.id] ?? blankUnit()
+        const ratio = masteryRatio(unit, progress)
+        return (
+          <section key={unit.id} className="mastery-block">
+            <h3>{unit.title}</h3>
+            <div className="meter-track" aria-label={`${Math.round(ratio * 100)} percent mastered`}>
+              <div className="meter-fill fill-happy" style={{ width: `${Math.round(ratio * 100)}%` }} />
+            </div>
+            <p className="fine">{Math.round(ratio * 100)}% mastered</p>
+            <ul className="plain-list mastery-items">
+              {unit.words.map((word) => {
+                const state = progress.words[word.id]
+                const label = state?.mastered ? 'mastered' : state?.weakened ? 'shaky' : `${Math.round(state?.meter ?? 0)}%`
+                return <li key={word.id}>{word.term} · {label}</li>
+              })}
+            </ul>
+            <div className="zone-row">
+              {ZONES.map((zone) => (
+                <button key={zone} type="button" className={progress.overrides[zone] ? 'on' : ''} onClick={() => setStudyOverride(kid.id, unit.id, zone, !progress.overrides[zone])}>
+                  {zone === 'legend' ? 'Boss' : zone} {progress.overrides[zone] ? 'open' : 'auto'}
+                </button>
+              ))}
+            </div>
+          </section>
+        )
+      })}
+    </div>
+  )
+}
 
 export function ParentPage() {
   const { ready, session, world, mode, signOutBay, clearDemo } = useBay()
@@ -27,17 +67,7 @@ export function ParentPage() {
           <article key={kid.id} className="panel">
             <h2>{kid.nickname}</h2>
             <p>{kid.credits} credits · {kid.motivation === 'fighter' ? DOJO_ACE.name : kid.turtle.name || 'Pebble'}</p>
-            {kid.id === 'sam' ? (
-              <div className="stack">
-                {hubUnits().map((unit) => {
-                  const progress = kid.study.units[unit.id]
-                  const ratio = progress ? masteryRatio(unit, progress) : 0
-                  return (
-                    <p key={unit.id}>{unit.title}: {Math.round(ratio * 100)}% mastered</p>
-                  )
-                })}
-              </div>
-            ) : null}
+            <MasteryBlock kid={kid} units={kid.motivation === 'fighter' ? hubUnits() : pebbleUnits()} />
             <ul className="plain-list">
               {kid.assignments.map((item) => <li key={item.id}>{item.title}{item.due ? ` · due ${item.due}` : ''}</li>)}
               {groupAssignments.map((item) => <li key={item.id}>{item.title} · from {item.authorFamilyName}{item.canEdit ? '' : ' · read only'}</li>)}

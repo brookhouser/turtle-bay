@@ -177,7 +177,7 @@ service cloud.firestore {
           || (isSchoolProfile(familyId, kidId)
             && noFamilySecrets()
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-              'credits', 'turtle', 'academicChecks', 'practiceDays', 'lessons', 'sessions', 'spellingSessions'
+              'credits', 'turtle', 'academicChecks', 'practiceDays', 'lessons', 'sessions', 'spellingSessions', 'study'
             ]));
         allow delete: if isParentOf(familyId);
 

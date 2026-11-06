@@ -44,6 +44,7 @@ import {
   equipItem as equipItemForKid,
   feedSpellingPatty,
   feedTurtle as feedTurtleForKid,
+  bankShellTreats,
   petTurtle as petTurtleForKid,
   recordSpellingSession,
   renameTurtle as renameTurtleForKid,
@@ -54,6 +55,7 @@ import { markDemoImported, withDemoProgress } from '../lib/demoImport'
 import { firebaseMode } from '../lib/env'
 import { loadSave, loadSession, loadWorld, persistSession, persistWorld } from '../lib/storage'
 import { MAP_MASTERY_CREDITS, MAP_UNIT_ID } from '../study/mapUnit'
+import { PEBBLE_UNIT_IDS } from '../study/pebbleUnits'
 import { applyAnswer, blankStudy, clampThresholds, ensureUnit, recordTestPrep, unlockFor, type StudyThresholds, type UnitOverrides, type ZoneId } from '../study/engine'
 import type { CharacterEdit, FighterLookId, KidProfile, LessonInput, LessonSummary, RoutineSlot, SessionData, SpellingSessionInput } from '../types'
 
@@ -73,6 +75,7 @@ export type BayContextValue = {
   renameTurtle: (name: string) => string | null
   petTurtle: () => string | null
   feedTurtle: (snackId?: string) => string | null
+  bankShells: (count?: number) => void
   cleanTurtle: () => string | null
   buyItem: (itemId: string) => string | null
   equipItem: (itemId: string) => string | null
@@ -370,9 +373,13 @@ export function BayProvider({ children }: { children: ReactNode }) {
 
   function answerStudy(unitId: string, wordId: string, correct: boolean) {
     const active = sessionRef.current
-    if (!active || active.role !== 'kid' || active.scope === 'school' || active.kidId !== 'sam') return null
-    const current = familyKid('sam')
+    if (!active || active.role !== 'kid') return null
+    const current = familyKid(active.kidId)
     if (!current) return null
+    const academic = PEBBLE_UNIT_IDS.has(unitId)
+    if (current.motivation === 'fighter') {
+      if (active.scope === 'school' || active.kidId !== 'sam' || academic) return null
+    } else if (!academic) return null
     const ensured = ensureUnit(current.study ?? blankStudy(), unitId)
     const effect = applyAnswer(ensured.unit, wordId, correct)
     const masteredCount = Object.values(effect.unit.words).filter((word) => word.mastered).length
@@ -405,6 +412,13 @@ export function BayProvider({ children }: { children: ReactNode }) {
     renameTurtle: (name) => mutateSelf((current) => renameTurtleForKid(current, name)),
     petTurtle: () => mutateSelf((current) => petTurtleForKid(current)),
     feedTurtle: (snackId) => mutateSelf((current) => feedTurtleForKid(current, snackId)),
+    bankShells: (count = 1) => {
+      const active = sessionRef.current
+      if (!active || active.role !== 'kid') return
+      const current = familyKid(active.kidId)
+      if (!current || current.motivation !== 'turtle') return
+      patchKid(bankShellTreats(current, count))
+    },
     cleanTurtle: () => mutateSelf((current) => cleanTurtleForKid(current)),
     buyItem: (itemId) => mutateSelf((current) => buyItemForKid(current, itemId)),
     equipItem: (itemId) => mutateSelf((current) => equipItemForKid(current, itemId)),

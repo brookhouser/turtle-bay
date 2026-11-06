@@ -18,6 +18,7 @@ import { StudyPage } from './pages/StudyPage'
 import { StudyPlayPage } from './pages/StudyPlayPage'
 import { DojoPage } from './pages/DojoPage'
 import { RunnerPage } from './pages/RunnerPage'
+import { PebbleRunPage } from './pages/PebbleRunPage'
 import { SchoolPage } from './pages/SchoolPage'
 import type { ReactNode } from 'react'
 
@@ -69,7 +70,9 @@ function RoutesView() {
       <Route path="/study/:unitId" element={<KidGate kind="fighter"><AppShell><StudyPlayPage /></AppShell></KidGate>} />
       <Route path="/dojo" element={<KidGate kind="fighter"><AppShell><DojoPage /></AppShell></KidGate>} />
       <Route path="/runner" element={<KidGate kind="fighter"><AppShell><RunnerPage /></AppShell></KidGate>} />
+      <Route path="/pebble-run" element={<KidGate named><AppShell><PebbleRunPage /></AppShell></KidGate>} />
       <Route path="/school" element={<SchoolGate><SchoolPage /></SchoolGate>} />
+      <Route path="/school/run" element={<SchoolGate><PebbleRunPage /></SchoolGate>} />
       <Route path="/parent" element={<ParentGate><ParentPage /></ParentGate>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

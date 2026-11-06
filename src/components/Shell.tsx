@@ -8,6 +8,7 @@ import { CoinIcon } from './Icons'
 
 const TURTLE_LINKS = [
   { to: '/home', label: 'Home' },
+  { to: '/pebble-run', label: 'Pebble Run' },
   { to: '/challenges', label: 'Challenges' },
   { to: '/shop', label: 'Shop' },
   { to: '/care', label: 'Care' },
@@ -21,6 +22,7 @@ const SAM_LINKS = [
 
 const SCHOOL_LINKS = [
   { to: '/school', label: 'School' },
+  { to: '/school/run', label: 'Pebble Run' },
 ]
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -48,7 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         {mode === 'demo' ? <span className="mode-chip">Demo</span> : <span className="mode-chip live">Synced</span>}
         <nav className="nav" aria-label="Bay">
           {links.map((link) => (
-            <NavLink key={link.to} to={link.to} className={({ isActive }) => (isActive ? 'active' : undefined)}>
+            <NavLink key={link.to} to={link.to} end={link.to === '/school'} className={({ isActive }) => (isActive ? 'active' : undefined)}>
               {link.label}
             </NavLink>
           ))}

@@ -17,6 +17,7 @@ export function samRunnerConfig(): RunnerConfig {
     gravity: 1500,
     jump: -520,
     holdBoost: 28,
+    hearts: 1,
     levels: RUNNER_LEVELS,
   }
 }

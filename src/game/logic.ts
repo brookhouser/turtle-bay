@@ -233,6 +233,23 @@ export function petTurtle(kid: KidProfile, now = Date.now()): { kid: KidProfile;
   }
 }
 
+export function bankShellTreats(kid: KidProfile, count = 1): KidProfile {
+  const snacks = Math.max(1, Math.round(count))
+  const inventory = { ...kid.turtle.inventory }
+  inventory['kelp-chip'] = (inventory['kelp-chip'] ?? 0) + snacks
+  return {
+    kid: {
+      ...kid,
+      turtle: {
+        ...kid.turtle,
+        inventory,
+        hunger: clampMeter(kid.turtle.hunger + snacks * 4),
+        happy: clampMeter(kid.turtle.happy + snacks * 2),
+      },
+    },
+  }.kid
+}
+
 export function feedTurtle(kid: KidProfile, snackId?: string, now = Date.now()): { kid: KidProfile; error?: string } {
   if (kid.turtle.hunger >= 99.5) return { kid, error: 'Full tummy. No more bites right now.' }
   let hungerGain = BASIC_FEED_HUNGER

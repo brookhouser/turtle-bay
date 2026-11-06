@@ -1,10 +1,10 @@
 import Phaser from 'phaser'
-import type { RunnerAbilityId, RunnerLevel } from './types'
-import type { RunnerConfig } from './types'
+import type { RunnerAbilityId, RunnerConfig, RunnerLevel, RunnerWorld } from './types'
 
 export type RunnerHooks = {
   onGate: () => void
   onStatus: (message: string) => void
+  onShell?: () => void
 }
 
 export type RunnerHandle = {
@@ -20,17 +20,25 @@ type MountOptions = {
   hooks: RunnerHooks
 }
 
+const THEMES: Record<RunnerWorld, { sky: string; ground: number; platform: number; wall: number }> = {
+  dojo: { sky: '#d7ecf5', ground: 0x0e756c, platform: 0xf0c14a, wall: 0x1c2740 },
+  beach: { sky: '#9fd7f2', ground: 0xe2b15a, platform: 0xf0d089, wall: 0xc47b3a },
+  reef: { sky: '#7ec8d4', ground: 0x0e4d5c, platform: 0x2a9d8f, wall: 0x145a6a },
+  volcano: { sky: '#f3c7a1', ground: 0x5c2a1a, platform: 0x8c3a22, wall: 0x2a120c },
+}
+
 export function mountRunner(options: MountOptions): RunnerHandle {
   let resolveGate: (correct: boolean) => void = () => {}
   const scene = new RunScene(options, (fn) => {
     resolveGate = fn
   })
+  const world = options.level.world ?? 'dojo'
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: options.parent,
     width: 960,
     height: 420,
-    backgroundColor: '#d7ecf5',
+    backgroundColor: THEMES[world].sky,
     physics: { default: 'arcade', arcade: { gravity: { x: 0, y: options.config.gravity } } },
     scene,
     scale: { mode: Phaser.Scale.NONE },
@@ -46,8 +54,12 @@ class RunScene extends Phaser.Scene {
   private readonly options: MountOptions
   private readonly bindResolve: (fn: (correct: boolean) => void) => void
   private player!: Phaser.Physics.Arcade.Sprite
+  private hat?: Phaser.GameObjects.Image
+  private scarf?: Phaser.GameObjects.Image
   private spikes!: Phaser.Physics.Arcade.StaticGroup
   private solids!: Phaser.Physics.Arcade.StaticGroup
+  private shells!: Phaser.Physics.Arcade.Group
+  private movers: Array<{ node: Phaser.GameObjects.Rectangle; body: Phaser.Physics.Arcade.Body; origin: number }> = []
   private jumpHeld = false
   private holdFrames = 0
   private jumps = 0
@@ -55,7 +67,11 @@ class RunScene extends Phaser.Scene {
   private shield = 0
   private speedScale = 1
   private dashing = 0
+  private gliding = false
   private gateOpen = false
+  private waiting = false
+  private hearts: number
+  private heartText!: Phaser.GameObjects.Text
   private readonly ability: Set<RunnerAbilityId>
 
   constructor(options: MountOptions, bindResolve: (fn: (correct: boolean) => void) => void) {
@@ -63,6 +79,7 @@ class RunScene extends Phaser.Scene {
     this.options = options
     this.bindResolve = bindResolve
     this.ability = new Set(options.abilities)
+    this.hearts = Math.max(1, options.config.hearts)
   }
 
   preload() {
@@ -70,24 +87,41 @@ class RunScene extends Phaser.Scene {
     this.load.image('run', poses.run)
     this.load.image('jump', poses.jump)
     this.load.image('dash', poses.dash)
+    if (poses.glide) this.load.image('glide', poses.glide)
+    const gear = this.options.config.character.gear
+    if (gear?.hat) this.load.image('hat', gear.hat)
+    if (gear?.scarf) this.load.image('scarf', gear.scarf)
   }
 
   create() {
-    const { tile, level } = { tile: this.options.config.tile, level: this.options.level }
+    const tile = this.options.config.tile
+    const level = this.options.level
+    const theme = THEMES[level.world ?? 'dojo']
     const cols = level.rows[0].length
+    const worldH = Math.max(level.rows.length * tile, 420)
     this.solids = this.physics.add.staticGroup()
     this.spikes = this.physics.add.staticGroup()
+    this.shells = this.physics.add.group()
     const gates: Phaser.GameObjects.Rectangle[] = []
     level.rows.forEach((row, y) => {
       ;[...row].forEach((cell, x) => {
         const px = x * tile + tile / 2
         const py = y * tile + tile / 2
         if (cell === 'G' || cell === '#' || cell === 'P' || cell === 'W') {
-          const color = cell === 'W' ? 0x1c2740 : cell === 'G' ? 0x0e756c : 0xf0c14a
+          const color = cell === 'W' ? theme.wall : cell === 'G' ? theme.ground : theme.platform
           const block = this.add.rectangle(px, py, tile - 2, tile - 2, color)
           this.physics.add.existing(block, true)
           this.solids.add(block)
           ;(block.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
+        }
+        if (cell === 'M') {
+          const platform = this.add.rectangle(px, py, tile - 4, 14, theme.platform)
+          this.physics.add.existing(platform)
+          const body = platform.body as Phaser.Physics.Arcade.Body
+          body.setAllowGravity(false)
+          body.setImmovable(true)
+          body.setVelocityX(36)
+          this.movers.push({ node: platform, body, origin: px })
         }
         if (cell === '^') {
           const spike = this.add.rectangle(px, py + 8, tile - 16, tile - 16, 0xb4234a)
@@ -95,8 +129,16 @@ class RunScene extends Phaser.Scene {
           this.spikes.add(spike)
           ;(spike.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
         }
+        if (cell === 'S') {
+          const shell = this.add.circle(px, py, 10, 0xf2c14e)
+          this.physics.add.existing(shell)
+          const body = shell.body as Phaser.Physics.Arcade.Body
+          body.setAllowGravity(false)
+          body.setCircle(10)
+          this.shells.add(shell)
+        }
         if (cell === 'Q') {
-          const gate = this.add.rectangle(px, py - tile, tile, tile * 2, 0xf0c14a, 0.9)
+          const gate = this.add.rectangle(px, py - 8, tile, tile * 3, 0xf0c14a, 0)
           this.physics.add.existing(gate, true)
           gates.push(gate)
         }
@@ -111,31 +153,55 @@ class RunScene extends Phaser.Scene {
     this.player.setDisplaySize(72, 96)
     this.player.setCollideWorldBounds(false)
     const body = this.player.body as Phaser.Physics.Arcade.Body
-    body.setSize(frameW * 0.34, frameH * 0.5)
-    body.setOffset(frameW * 0.33, frameH * 0.42)
+    const bodyW = 36 / this.player.scaleX
+    const bodyH = 46 / this.player.scaleY
+    body.setSize(bodyW, bodyH)
+    body.setOffset((frameW - bodyW) / 2, frameH - bodyH)
+    const groundTop = ground * tile + 1
+    this.player.setY(groundTop - 48)
+    body.updateFromGameObject()
+    if (this.textures.exists('scarf')) {
+      this.scarf = this.add.image(this.player.x, this.player.y, 'scarf').setDisplaySize(36, 22)
+    }
+    if (this.textures.exists('hat')) {
+      this.hat = this.add.image(this.player.x, this.player.y - 40, 'hat').setDisplaySize(40, 28)
+    }
     this.physics.add.collider(this.player, this.solids)
+    for (const mover of this.movers) this.physics.add.collider(this.player, mover.node)
     this.physics.add.overlap(this.player, this.spikes, () => this.touchSpike())
+    this.physics.add.overlap(this.player, this.shells, (_player, shell) => {
+      const item = shell as Phaser.GameObjects.Arc
+      if (!item.active) return
+      item.destroy()
+      this.options.hooks.onShell?.()
+      this.options.hooks.onStatus('A shell for the pantry.')
+    })
     for (const gate of gates) {
       this.physics.add.overlap(this.player, gate, () => {
         if (this.gateOpen) return
         this.gateOpen = true
-        gate.destroy()
-        this.physics.pause()
+        this.waiting = true
+        gate.setVisible(false)
+        ;(gate.body as Phaser.Physics.Arcade.StaticBody).enable = false
+        this.cameras.main.scrollY = 0
         this.options.hooks.onGate()
       })
     }
-    this.cameras.main.setBackgroundColor('#d7ecf5')
-    this.cameras.main.setBounds(0, 0, cols * tile, level.rows.length * tile)
-    this.cameras.main.startFollow(this.player, true, 0.1, 0.1)
+    this.cameras.main.setBackgroundColor(theme.sky)
+    this.cameras.main.setBounds(0, 0, cols * tile, worldH)
+    this.cameras.main.startFollow(this.player, true, 0.12, 0)
+    this.cameras.main.scrollY = 0
     this.physics.world.setBounds(0, 0, cols * tile, level.rows.length * tile + 200)
+    this.heartText = this.add.text(16, 12, '', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '22px', color: '#1c1915' }).setScrollFactor(0)
+    this.paintHearts()
     this.bindResolve((correct) => {
-      this.physics.resume()
+      this.waiting = false
       if (correct) {
-        this.speedScale = 1.45
+        this.speedScale = 1.35
         this.shield = 180
         this.options.hooks.onStatus('Boost. Shield and a faster line.')
       } else {
-        this.speedScale = 0.55
+        this.speedScale = 0.6
         this.options.hooks.onStatus('Slower route. The run keeps going.')
       }
       this.time.delayedCall(2800, () => {
@@ -163,6 +229,12 @@ class RunScene extends Phaser.Scene {
   update(_time: number, delta: number) {
     if (delta > 34) return
     const body = this.player.body as Phaser.Physics.Arcade.Body
+    this.cameras.main.setFollowOffset(0, this.cameras.main.height / 2 - this.player.y)
+    this.cameras.main.scrollY = 0
+    if (this.waiting) {
+      body.setVelocity(0, 0)
+      return
+    }
     if (this.stunned > 0) {
       this.stunned -= delta
       body.setVelocityX(40)
@@ -174,20 +246,60 @@ class RunScene extends Phaser.Scene {
       body.setVelocityY(body.velocity.y - this.options.config.holdBoost)
       this.holdFrames += 1
     }
+    this.gliding = false
     if (this.ability.has('glide') && this.jumpHeld && body.velocity.y > 40) {
       body.setVelocityY(40)
+      this.gliding = true
     }
     if (this.shield > 0) this.shield -= delta
     if (this.dashing > 0) {
       this.dashing -= delta
       this.player.setTexture('dash')
-    } else if (!body.blocked.down) this.player.setTexture('jump')
+    } else if (this.gliding && this.textures.exists('glide')) this.player.setTexture('glide')
+    else if (!body.blocked.down) this.player.setTexture('jump')
     else this.player.setTexture('run')
-    if (this.player.y > this.options.level.rows.length * this.options.config.tile + 80) {
-      this.player.setY(this.options.level.rows.length * this.options.config.tile - 80)
+    this.followGear()
+    this.movePlatforms()
+    this.pullShells()
+    this.cameras.main.setFollowOffset(0, this.cameras.main.height / 2 - this.player.y)
+    this.cameras.main.scrollY = 0
+    const floor = this.options.level.rows.length * this.options.config.tile
+    if (this.player.y > floor + 40) {
+      const tile = this.options.config.tile
+      const groundRow = this.options.level.rows.findIndex((row) => row.includes('G'))
+      body.reset(this.player.x + tile * 3, groundRow * tile - 20)
       this.stunned = 400
       this.options.hooks.onStatus('Caught the lower path. Still running.')
     }
+  }
+
+  private followGear() {
+    if (this.scarf) this.scarf.setPosition(this.player.x - 6, this.player.y + 8)
+    if (this.hat) this.hat.setPosition(this.player.x + 8, this.player.y - 42)
+  }
+
+  private movePlatforms() {
+    for (const platform of this.movers) {
+      if (platform.node.x > platform.origin + 70) platform.body.setVelocityX(-36)
+      if (platform.node.x < platform.origin - 70) platform.body.setVelocityX(36)
+    }
+  }
+
+  private pullShells() {
+    if (!this.ability.has('magnet')) return
+    const kids = this.shells.getChildren()
+    for (const child of kids) {
+      const shell = child as Phaser.GameObjects.Arc
+      if (!shell.active) continue
+      const body = shell.body as Phaser.Physics.Arcade.Body
+      const dx = this.player.x - shell.x
+      const dy = this.player.y - shell.y
+      if (dx * dx + dy * dy < 180 * 180) body.setVelocity(dx * 3, dy * 3)
+    }
+  }
+
+  private paintHearts() {
+    this.heartText.setText(`${'♥'.repeat(this.hearts)} ${this.hearts === 1 ? 'heart' : 'hearts'}`)
   }
 
   private tryJump() {
@@ -207,6 +319,13 @@ class RunScene extends Phaser.Scene {
       this.dashing = 280
       this.player.setTexture('dash')
       this.options.hooks.onStatus('Through the spikes.')
+      return
+    }
+    if (this.hearts > 1) {
+      this.hearts -= 1
+      this.paintHearts()
+      this.shield = 500
+      this.options.hooks.onStatus('The extra heart caught that. Still running.')
       return
     }
     this.stunned = 450

@@ -27,7 +27,12 @@ export function SchoolPage() {
           {kid.assignments.map((item) => <li key={item.id}><strong>{item.title}</strong> · due {item.due || 'soon'}</li>)}
         </ul>
       </section>
-      <p className="fine">{checks.length} assignment checks saved. <Link to="/home">Pebble</Link></p>
+      <section className="panel">
+        <h2>Pebble Run</h2>
+        <p>Spelling, math facts, and typing. Mastery opens jumps and the shell dash.</p>
+        <Link className="btn btn-primary" to="/school/run">Play the academic levels</Link>
+      </section>
+      <p className="fine">{checks.length} assignment checks saved. Pebble is here with his schoolwork.</p>
     </div>
   )
 }
