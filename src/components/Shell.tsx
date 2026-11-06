@@ -6,15 +6,30 @@ import { useBay } from '../context/useBay'
 import { TIER_SCENES, habitatUrl } from '../data/habitatScenes'
 import { CoinIcon } from './Icons'
 
-const LINKS = [
+const TURTLE_LINKS = [
   { to: '/home', label: 'Home' },
   { to: '/challenges', label: 'Challenges' },
   { to: '/shop', label: 'Shop' },
   { to: '/care', label: 'Care' },
 ]
 
+const SAM_LINKS = [
+  { to: '/study', label: 'Study' },
+  { to: '/dojo', label: 'Dojo' },
+  { to: '/runner', label: 'Runner' },
+]
+
+const SCHOOL_LINKS = [
+  { to: '/school', label: 'School' },
+]
+
 export function AppShell({ children }: { children: ReactNode }) {
-  const { kid, mode, signOutBay } = useBay()
+  const { kid, session, mode, signOutBay } = useBay()
+  const links = session?.role === 'kid' && session.scope === 'school'
+    ? SCHOOL_LINKS
+    : kid?.motivation === 'fighter'
+      ? SAM_LINKS
+      : TURTLE_LINKS
   const navigate = useNavigate()
   const coins = Math.round(kid?.turtle.coins ?? 0)
   if (kid) {
@@ -27,12 +42,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="app-frame">
       <header className="topbar">
-        <NavLink to="/home" className="brand">
+        <NavLink to={links[0]?.to ?? '/home'} className="brand">
           {APP_NAME}
         </NavLink>
         {mode === 'demo' ? <span className="mode-chip">Demo</span> : <span className="mode-chip live">Synced</span>}
         <nav className="nav" aria-label="Bay">
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <NavLink key={link.to} to={link.to} className={({ isActive }) => (isActive ? 'active' : undefined)}>
               {link.label}
             </NavLink>

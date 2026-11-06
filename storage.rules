@@ -1,0 +1,58 @@
+rules_version = '2';
+// Character edit images. Clients never write these. The cloud function uses the Admin SDK.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function googleUser() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email_verified == true
+        && request.auth.token.email is string;
+    }
+
+    function email() {
+      return request.auth.token.email.lower();
+    }
+
+    function emailKey() {
+      return email().replace('@', '_at_').replace('.', '_');
+    }
+
+    function isFoundingParent() {
+      return googleUser() && email() in [
+        'brookhouser@gmail.com',
+        'bbrookhouser@gmail.com'
+      ];
+    }
+
+    function isFoundingKid(kidId) {
+      return googleUser() && (
+        (kidId == 'sam' && email() == 'sambrookhouser@gmail.com')
+        || (kidId == 'wally' && email() == 'wilsonbrookhouser@gmail.com')
+      );
+    }
+
+    function isParentOf(familyId) {
+      return (familyId == 'turtlebay' && isFoundingParent())
+        || (familyId != 'turtlebay'
+          && googleUser()
+          && firestore.exists(/databases/(default)/documents/directory/$(emailKey()))
+          && firestore.get(/databases/(default)/documents/directory/$(emailKey())).data.role == 'parent'
+          && firestore.get(/databases/(default)/documents/directory/$(emailKey())).data.familyId == familyId);
+    }
+
+    function isKidSelf(familyId, kidId) {
+      return (familyId == 'turtlebay' && isFoundingKid(kidId))
+        || (familyId != 'turtlebay'
+          && googleUser()
+          && firestore.exists(/databases/(default)/documents/directory/$(emailKey()))
+          && firestore.get(/databases/(default)/documents/directory/$(emailKey())).data.role == 'kid'
+          && firestore.get(/databases/(default)/documents/directory/$(emailKey())).data.familyId == familyId
+          && firestore.get(/databases/(default)/documents/directory/$(emailKey())).data.kidId == kidId);
+    }
+
+    match /families/{familyId}/kids/{kidId}/edits/{file} {
+      allow read: if isParentOf(familyId) || isKidSelf(familyId, kidId);
+      allow write: if false;
+    }
+  }
+}

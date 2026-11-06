@@ -1,3 +1,5 @@
+import type { StudyState } from './study/engine'
+
 export type HabitatTier = 1 | 2 | 3
 
 export type ItemCategory = 'hat' | 'scarf' | 'plant' | 'snack' | 'bed'
@@ -113,16 +115,100 @@ export type CustomChallenge = {
   createdAt: string
 }
 
+export type Motivation = 'turtle' | 'fighter'
+
+export type RoutineSlot = 'morning' | 'evening'
+
+export type RepeatMode = 'daily' | 'once'
+
+export type TaskItem = {
+  id: string
+  title: string
+  notes: string
+  points: number
+  repeat: RepeatMode
+  active: boolean
+  createdAt: string
+}
+
+export type RoutineItem = {
+  id: string
+  title: string
+  slot: RoutineSlot
+  points: number
+  active: boolean
+}
+
+export type PersonalAssignment = {
+  id: string
+  title: string
+  subject: string
+  notes: string
+  points: number
+  due: string
+  link: string
+  active: boolean
+  createdAt: string
+}
+
+export type CompletionKind = 'task' | 'routine' | 'assignment'
+
+export type Completion = {
+  id: string
+  itemId: string
+  kind: CompletionKind
+  source: 'kid' | 'group'
+  groupId: string
+  day: string
+  pointsAwarded: number
+  happyAwarded: number
+  completedAt: string
+}
+
+export type FighterLookId = 'shadow-blade' | 'dojo-ace' | 'pulse-fist' | 'street-flow'
+
+export type FighterState = {
+  lookId: FighterLookId | null
+  unlocked: string[]
+  equippedGear: string[]
+  portraitUrl: string | null
+}
+
+export type CharacterEdit = {
+  id: string
+  prompt: string
+  status: 'preview' | 'kept' | 'discarded' | 'blocked'
+  cost: number
+  reason: string
+  createdAt: string
+  previewUrl: string | null
+  retriesLeft: number
+}
+
 export type KidProfile = {
   id: string
+  familyId: string
   nickname: string
+  email: string
+  grade: string
+  motivation: Motivation
+  archived: boolean
+  groupIds: string[]
   pinHash: string
+  credits: number
   turtle: TurtleState
   lessons: Record<string, LessonProgress>
   sessions: TypingSession[]
   spellingSessions: SpellingSession[]
   customChallenges: CustomChallenge[]
   practiceDays: string[]
+  tasks: TaskItem[]
+  routines: RoutineItem[]
+  assignments: PersonalAssignment[]
+  completions: Completion[]
+  fighter: FighterState | null
+  editHistory: CharacterEdit[]
+  study: StudyState
   createdAt: string
 }
 
@@ -130,9 +216,11 @@ export type SaveData = {
   kids: KidProfile[]
 }
 
+export type ViewScope = 'family' | 'school'
+
 export type SessionData =
-  | { role: 'kid'; kidId: string }
-  | { role: 'parent'; email: string }
+  | { role: 'kid'; familyId: string; kidId: string; email: string; scope: ViewScope }
+  | { role: 'parent'; familyId: string; email: string }
 
 export type ChallengeDraft = {
   type: ChallengeType

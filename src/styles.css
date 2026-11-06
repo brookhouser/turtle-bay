@@ -742,3 +742,34 @@ th { font-size: 0.9rem; }
     transition: none !important;
   }
 }
+
+.study-grid, .choice-grid, .look-grid, .pose-list { display: grid; gap: 12px; }
+.study-grid, .choice-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.study-card { text-decoration: none; display: grid; gap: 8px; }
+.sheet-hero { width: min(420px, 100%); border-radius: 28px; background: #f4f1ea; }
+.pose-list { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); list-style: none; padding: 0; }
+.pose-list li { display: grid; gap: 4px; font-size: 0.9rem; }
+.pose-list img { width: 100%; border-radius: 16px; background: #f4f1ea; }
+.pose-missing { display: grid; place-items: center; min-height: 120px; border: 3px dashed var(--ink); border-radius: 16px; }
+.wave-wrap { display: grid; gap: 12px; }
+.zone-row, .skill-row { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
+.zone-row button, .skill-row li { border: 3px solid var(--ink); border-radius: 999px; padding: 6px 12px; background: white; }
+.zone-row button.on, .skill-row li.on { background: var(--ink); color: white; }
+.wave-board { position: relative; height: min(68vh, 560px); border: 3px solid var(--ink); border-radius: 28px; overflow: hidden; background: linear-gradient(#f7f4ee, #e7eef6); touch-action: none; }
+.wave-map, .wave-lane { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wave-map path { fill: #f4efe4; stroke: #1c2740; stroke-width: 2; }
+.wave-map path.is-target { fill: #f0c14a; }
+.wave-lane { pointer-events: none; }
+.wave-lane polyline { fill: none; stroke: #0e756c; stroke-width: 2; }
+.enemy { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: #3ac569; border: 3px solid var(--ink); }
+.enemy.boss { width: 36px; height: 36px; margin: -18px 0 0 -18px; background: #b4234a; }
+.hero-token { position: absolute; width: 120px; margin: -150px 0 0 -60px; border: 0; background: transparent; padding: 0; display: grid; justify-items: center; }
+.hero-token img { width: 120px; height: 150px; object-fit: contain; filter: drop-shadow(0 8px 0 rgba(28, 39, 64, 0.15)); }
+.hero-token span { font-weight: 800; }
+.combo-meter { position: absolute; left: 12px; right: 12px; bottom: 12px; height: 14px; border: 3px solid var(--ink); border-radius: 999px; background: white; overflow: hidden; }
+.combo-meter span { display: block; height: 100%; background: #f0c14a; }
+.question-card, .banner { margin: 0; }
+.runner-track { position: relative; height: 320px; border: 3px solid var(--ink); border-radius: 28px; background: linear-gradient(#f7f4ee, #d7ecf5); overflow: hidden; }
+.runner-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; background: #0e756c; border-top: 3px solid var(--ink); }
+.runner-hero { position: absolute; width: 140px; height: 170px; object-fit: contain; transform: translateX(-50%); }
+.wave-board.is-retreat .hero-token { opacity: 0.85; }

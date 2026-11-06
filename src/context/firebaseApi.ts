@@ -1,15 +1,16 @@
 import type { User } from 'firebase/auth'
-import type { KidProfile } from '../types'
+import type { World } from '../family/model'
+import type { SessionData } from '../types'
 
 export type FirebaseApi = {
-  saveKid: (kid: KidProfile) => Promise<void>
-  loadKid: (id: string) => Promise<KidProfile | null>
-  watchAuth: (onUser: (user: User | null) => void) => () => void
-  watchKids: (onData: (kids: KidProfile[]) => void, onError: (message: string) => void) => () => void
-  signUpKid: (nickname: string, pin: string) => Promise<KidProfile>
-  signInKid: (nickname: string, pin: string) => Promise<KidProfile>
-  createKidAsParent: (nickname: string, pin: string) => Promise<KidProfile>
-  signInParent: () => Promise<{ email: string }>
-  isParentUser: (user: User) => Promise<boolean>
+  signInWithGoogle: () => Promise<{ email: string }>
   signOutBay: () => Promise<void>
+  watchAuth: (onUser: (user: User | null) => void) => () => void
+  loadAccount: (email: string) => Promise<SessionData | null>
+  subscribeFamily: (
+    session: SessionData,
+    onWorld: (world: World) => void,
+    onError: (message: string) => void,
+  ) => () => void
+  persistDiff: (prev: World, next: World, session: SessionData) => Promise<void>
 }
