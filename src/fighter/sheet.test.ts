@@ -14,7 +14,7 @@ describe('Dojo Ace sheet', () => {
   it('records which poses came from the sheet', () => {
     const fromSheet = DOJO_ACE_POSES.filter((pose) => pose.status === 'from-sheet').map((pose) => pose.id)
     const needed = DOJO_ACE_POSES.filter((pose) => pose.status === 'needed').map((pose) => pose.id)
-    expect(fromSheet).toEqual(['run', 'jump', 'spin-kick', 'retreat'])
+    expect(fromSheet).toEqual(['run', 'jump', 'dash', 'spin-kick', 'retreat'])
     expect(DOJO_ACE_POSES.find((pose) => pose.id === 'ready')?.status).toBe('reference')
     expect(needed).toContain('super')
     expect(needed).toContain('skins')

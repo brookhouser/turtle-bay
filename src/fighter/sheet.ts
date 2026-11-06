@@ -1,6 +1,6 @@
 export const SAM_FIGHTER_ID = 'dojo-ace' as const
 
-export type PoseId = 'ready' | 'run' | 'jump' | 'spin-kick' | 'retreat'
+export type PoseId = 'ready' | 'run' | 'jump' | 'dash' | 'spin-kick' | 'retreat'
 
 export type PoseStatus = 'reference' | 'from-sheet' | 'needed'
 
@@ -35,6 +35,13 @@ export const DOJO_ACE_POSES: PoseArt[] = [
     file: 'fighters/dojo-ace/jump.jpg',
     status: 'from-sheet',
     usedBy: 'Platform runner, in the air',
+  },
+  {
+    id: 'dash',
+    label: 'Dash',
+    file: 'fighters/dojo-ace/dash.jpg',
+    status: 'from-sheet',
+    usedBy: 'Platform runner, slipping through spikes',
   },
   {
     id: 'spin-kick',
