@@ -76,7 +76,10 @@ class RunScene extends Phaser.Scene {
   private reported = 0
   private skyImage?: Phaser.GameObjects.Image
   private midImage?: Phaser.GameObjects.Image
-  private frontImage?: Phaser.GameObjects.Image
+  private horizon = 320
+  private viewH = 420
+  private shift = 0
+  private pose = ''
   private readonly ability: Set<RunnerAbilityId>
 
   constructor(options: MountOptions, bindResolve: (fn: (correct: boolean) => void) => void) {
@@ -124,102 +127,81 @@ class RunScene extends Phaser.Scene {
     const level = this.options.level
     const theme = THEMES[level.world ?? 'dojo']
     const cols = level.rows[0].length
-    const worldH = Math.max(level.rows.length * tile, 420)
-    if (this.textures.exists('sky')) {
-      this.skyImage = this.add.image(0, 0, 'sky').setOrigin(0, 0).setScrollFactor(0).setDepth(-30)
-      this.skyImage.setDisplaySize(1800, 420)
-    }
-    const groundLine = (level.rows.findIndex((row) => row.includes('G')) || 4) * tile
-    if (this.textures.exists('mid')) {
-      this.midImage = this.add.image(0, groundLine - 6, 'mid').setOrigin(0, 1).setScrollFactor(0).setDepth(-20)
-      this.midImage.setDisplaySize(1680, 210)
-    }
-    if (this.textures.exists('front')) {
-      this.frontImage = this.add.image(0, 418, 'front').setOrigin(0, 1).setScrollFactor(0).setDepth(8)
-      this.frontImage.setDisplaySize(1500, 52)
-    }
+    const groundRow = Math.max(0, level.rows.findIndex((row) => row.includes('G')))
+    this.viewH = 420
+    this.horizon = Math.round(this.viewH * 0.77)
+    this.shift = this.horizon - groundRow * tile
+    this.paintBackdrop(level.world ?? 'dojo')
     this.solids = this.physics.add.staticGroup()
     this.spikes = this.physics.add.staticGroup()
     this.shells = this.physics.add.group()
     const gates: Phaser.GameObjects.Rectangle[] = []
+    this.paintPits(level, tile)
     level.rows.forEach((row, y) => {
       ;[...row].forEach((cell, x) => {
         const px = x * tile + tile / 2
-        const py = y * tile + tile / 2
+        const py = this.rowTop(y) + tile / 2
+        const onGround = y === groundRow && (cell === 'G' || cell === '^')
+        const buried = cell === 'G' && y === this.topGroundRow(x) && y !== groundRow
         if (cell === 'W') {
-          const lip = this.textures.exists('ground') ? this.paintLip(px, py - tile * 0.2, tile, true) : null
-          const groundY = this.topGroundRow(x)
-          const bottom = groundY >= 0 ? groundY * tile - 4 : py + tile
-          const postH = Math.max(tile * 0.8, bottom - y * tile)
+          const walkY = this.rowTop(y)
+          this.paintLip(px, walkY, tile, true)
           if (this.textures.exists('fill')) {
-            this.add.image(px, bottom, 'fill').setOrigin(0.5, 1).setDisplaySize(16, postH).setDepth(1)
+            const postBottom = Math.min(this.horizon - 6, walkY + tile * 1.3)
+            this.add.image(px, postBottom, 'fill').setOrigin(0.5, 1).setDisplaySize(14, Math.max(18, postBottom - walkY)).setDepth(1)
           }
-          if (lip && this.textures.exists('capL')) {
-            this.add.image(px, py - tile * 0.2, 'capL').setDisplaySize(lip.width, lip.height).setOrigin(0.5, lip.originY).setDepth(3)
-            this.add.image(px, py - tile * 0.2, 'capR').setDisplaySize(lip.width, lip.height).setOrigin(0.5, lip.originY).setDepth(3)
-          }
-          const block = this.add.rectangle(px, py, tile - 8, tile - 4, theme.wall, 0)
-          this.physics.add.existing(block, true)
-          this.solids.add(block)
-          ;(block.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
+          this.addSolid(px, walkY + 8, tile - 10, 16, theme.wall)
         }
-        if (cell === 'G' || cell === '#' || cell === 'P') {
-          const floating = cell === '#' || cell === 'P'
-          const surface = floating || y === this.topGroundRow(x)
-          const color = cell === 'W' ? theme.wall : cell === 'G' ? theme.ground : theme.platform
-          if (!floating && this.textures.exists('fill')) {
-            if (surface) this.add.image(px, py - 10, 'fill').setOrigin(0.5, 0).setDisplaySize(tile + 2, tile + 16).setDepth(0)
-            else this.add.image(px, py, 'fill').setDisplaySize(tile + 2, tile + 2).setDepth(0)
+        if (onGround || buried) {
+          const walkY = this.rowTop(y)
+          if (this.textures.exists('fill')) this.paintColumnFill(px, walkY, tile)
+          const lip = this.paintLip(px, walkY, tile, false)
+          const left = row[x - 1]
+          const right = row[x + 1]
+          if (lip && !this.isGround(left)) this.paintCap('capL', px, walkY, lip)
+          if (lip && !this.isGround(right)) this.paintCap('capR', px, walkY, lip)
+          this.addSolid(px, walkY + 8, tile - 2, 16, theme.ground)
+          if (cell === '^') this.paintSpike(px, walkY)
+        }
+        if (cell === '#' || cell === 'P') {
+          const walkY = this.rowTop(y)
+          const lip = this.paintLip(px, walkY, tile, true)
+          const left = row[x - 1]
+          const right = row[x + 1]
+          if (lip && !this.isSolid(left)) this.paintCap('capL', px, walkY, lip)
+          if (lip && !this.isSolid(right)) this.paintCap('capR', px, walkY, lip)
+          if (this.textures.exists('support')) {
+            this.add.image(px, walkY + 6, 'support').setOrigin(0.5, 0).setDisplaySize(22, 42).setDepth(1)
           }
-          if (surface && this.textures.exists('ground')) {
-            const lip = this.paintLip(px, py, tile, floating)
-            const rowText = level.rows[y]
-            if (!this.isSolid(rowText[x - 1]) && this.textures.exists('capL')) {
-              this.add.image(px, py, 'capL').setDisplaySize(lip.width, lip.height).setOrigin(0.5, lip.originY).setDepth(3)
-            }
-            if (!this.isSolid(rowText[x + 1]) && this.textures.exists('capR')) {
-              this.add.image(px, py, 'capR').setDisplaySize(lip.width, lip.height).setOrigin(0.5, lip.originY).setDepth(3)
-            }
-          }
-          if (floating && this.textures.exists('support')) {
-            this.add.image(px, py + 4, 'support').setOrigin(0.5, 0).setDisplaySize(22, 48).setDepth(1)
-          }
-          const block = this.add.rectangle(px, floating ? py - 10 : py, tile - 2, floating ? 14 : tile - 2, color, 0)
-          this.physics.add.existing(block, true)
-          this.solids.add(block)
-          ;(block.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
+          this.addSolid(px, walkY + 8, tile - 2, 16, theme.platform)
         }
         if (cell === 'M') {
-          const platform = this.add.rectangle(px, py, tile - 4, 14, theme.platform, 0)
+          const walkY = this.rowTop(y)
+          const platform = this.add.rectangle(px, walkY + 8, tile - 4, 16, theme.platform, 0)
           this.physics.add.existing(platform)
           const body = platform.body as Phaser.Physics.Arcade.Body
           body.setAllowGravity(false)
           body.setImmovable(true)
           body.setVelocityX(36)
-          const art = this.textures.exists('ground')
-            ? this.add.image(px, py, 'ground').setDisplaySize(tile + 4, 22).setOrigin(0.5, 0.82).setDepth(2)
-            : undefined
+          const art = this.textures.exists('ground') ? this.paintLip(px, walkY, tile, true)?.image : undefined
           this.movers.push({ node: platform, body, origin: px, art })
         }
-        if (cell === '^') {
-          if (this.textures.exists('spike')) this.add.image(px, py + tile / 2, 'spike').setOrigin(0.5, 1).setDisplaySize(26, 54).setDepth(3)
-          const spike = this.add.rectangle(px, py + 8, tile - 16, tile - 16, 0xb4234a, this.textures.exists('spike') ? 0 : 1)
-          this.physics.add.existing(spike, true)
-          this.spikes.add(spike)
-          ;(spike.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
-        }
-        if (cell === 'S') {
-          const token = this.textures.exists('prize') ? this.add.image(px, py, 'prize').setDisplaySize(34, 34).setDepth(2) : null
-          const shell = this.add.circle(px, py, 12, 0xf2c14e, token ? 0 : 1)
-          shell.setData('token', token)
-          this.physics.add.existing(shell)
-          const body = shell.body as Phaser.Physics.Arcade.Body
-          body.setAllowGravity(false)
-          body.setCircle(12)
-          this.shells.add(shell)
+        if (cell === '^' && !onGround) this.paintSpike(px, this.rowTop(y) + tile)
+        if (cell === 'S' || cell === 'Q') {
+          const rest = this.columnWalk(x, groundRow)
+          if (this.textures.exists('prize')) {
+            this.add.image(px, rest, 'prize').setOrigin(0.5, 1).setDisplaySize(32, 32).setDepth(3)
+          }
+          if (cell === 'S') {
+            const shell = this.add.circle(px, rest - 14, 12, 0xf2c14e, 0)
+            this.physics.add.existing(shell)
+            const body = shell.body as Phaser.Physics.Arcade.Body
+            body.setAllowGravity(false)
+            body.setCircle(12)
+            this.shells.add(shell)
+          }
         }
         if (cell === 'Q') {
-          if (this.textures.exists('prize')) this.add.image(px, py - tile, 'prize').setDisplaySize(36, 36)
           const gate = this.add.rectangle(px, py - 8, tile, tile * 3, 0xf0c14a, 0)
           this.physics.add.existing(gate, true)
           gates.push(gate)
@@ -228,23 +210,13 @@ class RunScene extends Phaser.Scene {
     })
     this.solids.refresh()
     this.spikes.refresh()
-    this.fillBelowGround(tile, level)
-    this.placeProps(tile, level)
-    const ground = level.rows.findIndex((row) => row.includes('G'))
-    this.player = this.physics.add.sprite(tile * 2, ground * tile - tile, 'run')
-    const frameW = this.player.width
-    const frameH = this.player.height
-    this.player.setDisplaySize(72, 96)
+    this.shadeFill(cols, tile, level.world ?? 'dojo')
+    this.placeProps(tile, level, groundRow)
+    this.player = this.physics.add.sprite(tile * 2, this.horizon, 'run')
     this.player.setDepth(4)
     this.player.setCollideWorldBounds(false)
-    const body = this.player.body as Phaser.Physics.Arcade.Body
-    const bodyW = 36 / this.player.scaleX
-    const bodyH = 46 / this.player.scaleY
-    body.setSize(bodyW, bodyH)
-    body.setOffset((frameW - bodyW) / 2, frameH - bodyH)
-    const groundTop = ground * tile + 1
-    this.player.setY(groundTop - 48)
-    body.updateFromGameObject()
+    this.usePose('run')
+    this.player.setY(this.horizon)
     if (this.textures.exists('scarf')) {
       this.scarf = this.add.image(this.player.x, this.player.y, 'scarf').setDisplaySize(36, 22)
     }
@@ -275,10 +247,10 @@ class RunScene extends Phaser.Scene {
       })
     }
     this.cameras.main.setBackgroundColor(theme.sky)
-    this.cameras.main.setBounds(0, 0, cols * tile, worldH)
+    this.cameras.main.setBounds(0, 0, cols * tile, this.viewH)
     this.cameras.main.startFollow(this.player, true, 0.12, 0)
     this.cameras.main.scrollY = 0
-    this.physics.world.setBounds(0, 0, cols * tile, level.rows.length * tile + 200)
+    this.physics.world.setBounds(0, 0, cols * tile, this.viewH + 80)
     this.options.hooks.onHearts?.(this.hearts)
     this.options.hooks.onProgress?.(0)
     this.bindResolve((correct) => {
@@ -325,11 +297,7 @@ class RunScene extends Phaser.Scene {
     }
     if (this.midImage) {
       const maxShift = Math.max(0, this.midImage.displayWidth - 960)
-      this.midImage.x = -Math.min(maxShift, scroll * 0.38)
-    }
-    if (this.frontImage) {
-      const maxShift = Math.max(0, this.frontImage.displayWidth - 960)
-      this.frontImage.x = -Math.min(maxShift, scroll * 1.15)
+      this.midImage.x = -Math.min(maxShift, scroll * 0.34)
     }
     const span = Math.max(1, this.options.level.rows[0].length * this.options.config.tile - 960)
     const next = Math.min(1, scroll / span)
@@ -360,20 +328,19 @@ class RunScene extends Phaser.Scene {
     if (this.shield > 0) this.shield -= delta
     if (this.dashing > 0) {
       this.dashing -= delta
-      this.player.setTexture('dash')
-    } else if (this.gliding && this.textures.exists('glide')) this.player.setTexture('glide')
-    else if (!body.blocked.down) this.player.setTexture('jump')
-    else this.player.setTexture('run')
+      this.usePose('dash')
+    } else if (this.gliding && this.textures.exists('glide')) this.usePose('glide')
+    else if (!body.blocked.down) this.usePose('jump')
+    else this.usePose('run')
     this.followGear()
     this.movePlatforms()
     this.pullShells()
     this.cameras.main.setFollowOffset(0, this.cameras.main.height / 2 - this.player.y)
     this.cameras.main.scrollY = 0
-    const floor = this.options.level.rows.length * this.options.config.tile
-    if (this.player.y > floor + 40) {
+    if (this.player.y > this.viewH + 24) {
       const tile = this.options.config.tile
-      const groundRow = this.options.level.rows.findIndex((row) => row.includes('G'))
-      body.reset(this.player.x + tile * 3, groundRow * tile - 20)
+      body.reset(this.player.x + tile * 3, this.horizon)
+      this.usePose('run')
       this.stunned = 400
       this.options.hooks.onStatus('Caught the lower path. Still running.')
     }
@@ -388,7 +355,7 @@ class RunScene extends Phaser.Scene {
     for (const platform of this.movers) {
       if (platform.node.x > platform.origin + 70) platform.body.setVelocityX(-36)
       if (platform.node.x < platform.origin - 70) platform.body.setVelocityX(36)
-      platform.art?.setPosition(platform.node.x, platform.node.y)
+      platform.art?.setPosition(platform.node.x, platform.node.y - 8)
     }
   }
 
@@ -413,14 +380,188 @@ class RunScene extends Phaser.Scene {
     return cell === 'G' || cell === '#' || cell === 'P' || cell === 'W'
   }
 
-  private paintLip(px: number, py: number, tile: number, floating: boolean): { width: number; height: number; originY: number } {
+  private paintLip(px: number, walkY: number, tile: number, floating: boolean): { width: number; height: number; deck: number; image: Phaser.GameObjects.Image } | null {
+    if (!this.textures.exists('ground')) return null
     const src = this.textures.get('ground').getSourceImage() as { width: number; height: number }
-    const width = tile + 3
+    const width = tile + 4
     const natural = width * (src.height / Math.max(1, src.width))
-    const height = Math.min(tile * 0.9, Math.max(18, natural))
-    const originY = floating ? 0.88 : 0.8
-    this.add.image(px, py, 'ground').setDisplaySize(width, height).setOrigin(0.5, originY).setDepth(2)
-    return { width, height, originY }
+    const height = floating ? Math.max(20, Math.min(28, natural)) : Math.max(22, Math.min(tile * 0.7, natural * 1.4))
+    const deck = this.imageAnchor('ground', 'deck')
+    const image = this.add.image(px, walkY, 'ground').setDisplaySize(width, height).setOrigin(0.5, deck).setDepth(2)
+    return { width, height, deck, image }
+  }
+
+  private paintCap(key: string, px: number, walkY: number, lip: { width: number; height: number; deck: number }) {
+    if (!this.textures.exists(key)) return
+    this.add.image(px, walkY, key).setDisplaySize(lip.width, lip.height).setOrigin(0.5, lip.deck).setDepth(3)
+  }
+
+  private paintSpike(px: number, walkY: number) {
+    if (this.textures.exists('spike')) this.add.image(px, walkY, 'spike').setOrigin(0.5, 1).setDisplaySize(28, 36).setDepth(3)
+    const spike = this.add.rectangle(px, walkY - 14, 20, 26, 0xb4234a, 0)
+    this.physics.add.existing(spike, true)
+    this.spikes.add(spike)
+    ;(spike.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
+  }
+
+  private addSolid(px: number, centerY: number, width: number, height: number, color: number) {
+    const block = this.add.rectangle(px, centerY, width, height, color, 0)
+    this.physics.add.existing(block, true)
+    this.solids.add(block)
+    ;(block.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
+  }
+
+  private rowTop(row: number): number {
+    return row * this.options.config.tile + this.shift
+  }
+
+  private columnWalk(x: number, groundRow: number): number {
+    const top = this.topGroundRow(x)
+    if (top < 0) return this.horizon
+    if (this.options.level.rows[groundRow]?.[x] === 'G' || this.options.level.rows[groundRow]?.[x] === '^') return this.horizon
+    return this.rowTop(top)
+  }
+
+  private isGround(cell: string | undefined): boolean {
+    return cell === 'G' || cell === '^'
+  }
+
+  private usePose(name: string) {
+    if (!this.textures.exists(name) || this.pose === name) return
+    this.pose = name
+    this.player.setTexture(name)
+    const frame = this.player.frame
+    const dh = 90
+    const dw = dh * (frame.width / Math.max(1, frame.height))
+    this.player.setDisplaySize(dw, dh)
+    this.player.setOrigin(0.5, 1)
+    const body = this.player.body as Phaser.Physics.Arcade.Body
+    const bodyW = 28 / this.player.scaleX
+    const bodyH = 42 / this.player.scaleY
+    body.setSize(bodyW, bodyH, false)
+    body.setOffset((frame.width - bodyW) / 2, frame.height - bodyH)
+    body.updateFromGameObject()
+  }
+
+  private paintBackdrop(world: RunnerWorld) {
+    const anchor: Record<RunnerWorld, number> = { dojo: 0.9, beach: 0.985, reef: 0.94, volcano: 0.97 }
+    if (this.textures.exists('sky')) this.skyImage = this.placeCover('sky', -30, anchor[world])
+    if (this.textures.exists('mid') && this.imageAnchor('mid', 'deck') > 0.12) {
+      const src = this.textures.get('mid').getSourceImage() as { width: number; height: number }
+      const dw = 1760
+      this.midImage = this.add.image(0, this.horizon + 18, 'mid').setOrigin(0, 1).setScrollFactor(0).setDepth(-18)
+      this.midImage.setDisplaySize(dw, dw * (src.height / src.width))
+    }
+  }
+
+  private placeCover(key: string, depth: number, anchor: number) {
+    const src = this.textures.get(key).getSourceImage() as { width: number; height: number }
+    const scale = Math.max(this.horizon / Math.max(0.25, anchor) / src.height, 1760 / src.width)
+    const image = this.add.image(0, this.horizon + 4, key).setOrigin(0, anchor).setScrollFactor(0).setDepth(depth)
+    image.setDisplaySize(src.width * scale, src.height * scale)
+    return image
+  }
+
+  private imageAnchor(key: string, mode: 'deck' | 'foot'): number {
+    const img = this.textures.get(key).getSourceImage() as CanvasImageSource & { width: number; height: number }
+    const w = img.width
+    const h = img.height
+    if (!w || !h) return mode === 'foot' ? 1 : 0
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.min(w, 160)
+    canvas.height = Math.min(h, 160)
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
+    if (!ctx) return mode === 'foot' ? 1 : 0
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+    const cw = canvas.width
+    const ch = canvas.height
+    const coverage = (y: number) => {
+      let n = 0
+      let total = 0
+      for (let x = 0; x < cw; x += 2) {
+        total += 1
+        if (data[(y * cw + x) * 4 + 3] > 40) n += 1
+      }
+      return total ? n / total : 0
+    }
+    if (mode === 'foot') {
+      for (let y = ch - 1; y >= 0; y -= 1) if (coverage(y) > 0.02) return (y + 1) / ch
+      return 1
+    }
+    for (let y = 0; y < ch; y += 1) if (coverage(y) > 0.4) return y / ch
+    return 0
+  }
+
+  private paintColumnFill(px: number, fromY: number, tile: number) {
+    const bottom = this.viewH + tile
+    let band = 0
+    for (let y = fromY; y < bottom; y += tile) {
+      const sprite = this.add.image(px, y, 'fill').setOrigin(0.5, 0).setDisplaySize(tile + 2, tile + 3).setDepth(0)
+      const t = Phaser.Math.Clamp((y - this.horizon) / Math.max(1, this.viewH - this.horizon), 0, 1)
+      const wobble = (band + Math.floor(px / tile)) % 3
+      const shade = Math.floor(255 - 100 * t - wobble * 14)
+      sprite.setTint(Phaser.Display.Color.GetColor(Math.max(40, shade - 16), Math.max(28, shade - 28), Math.max(18, shade - 40)))
+      band += 1
+    }
+  }
+
+  private paintPits(level: RunnerLevel, tile: number) {
+    const groundRow = level.rows.findIndex((row) => row.includes('G'))
+    if (groundRow < 0) return
+    const key = 'pit-shade'
+    if (!this.textures.exists(key)) {
+      const tex = this.textures.createCanvas(key, 4, 128)
+      if (!tex) return
+      const ctx = tex.getContext()
+      const fade = ctx.createLinearGradient(0, 0, 0, 128)
+      fade.addColorStop(0, '#4a3024')
+      fade.addColorStop(0.4, '#2a1812')
+      fade.addColorStop(1, '#100806')
+      ctx.fillStyle = fade
+      ctx.fillRect(0, 0, 4, 128)
+      tex.refresh()
+    }
+    const tint = level.world === 'reef' ? 0x12343c : level.world === 'volcano' ? 0x2a120c : level.world === 'beach' ? 0xc49a62 : 0xffffff
+    for (let x = 0; x < level.rows[groundRow].length; x += 1) {
+      const cell = level.rows[groundRow][x]
+      if (cell === 'G' || cell === '^') continue
+      let bottom = this.viewH + 10
+      for (let y = groundRow + 1; y < level.rows.length; y += 1) {
+        if (level.rows[y][x] === 'G') {
+          bottom = this.rowTop(y)
+          break
+        }
+      }
+      const height = Math.max(tile, bottom - this.horizon)
+      const pit = this.add.image(x * tile + tile / 2, this.horizon - 2, key).setOrigin(0.5, 0).setDisplaySize(tile + 2, height + 2).setDepth(-8)
+      if (tint !== 0xffffff) pit.setTint(tint)
+    }
+  }
+
+  private shadeFill(cols: number, tile: number, world: RunnerWorld) {
+    const key = 'ground-shade'
+    if (!this.textures.exists(key)) {
+      const tex = this.textures.createCanvas(key, 4, 128)
+      if (!tex) return
+      const ctx = tex.getContext()
+      const fade = ctx.createLinearGradient(0, 0, 0, 128)
+      fade.addColorStop(0, 'rgba(0,0,0,0)')
+      fade.addColorStop(0.45, 'rgba(0,0,0,0.1)')
+      fade.addColorStop(1, 'rgba(0,0,0,0.48)')
+      ctx.fillStyle = fade
+      ctx.fillRect(0, 0, 4, 128)
+      tex.refresh()
+    }
+    const height = this.viewH - this.horizon + 8
+    this.add.image((cols * tile) / 2, this.horizon, key).setOrigin(0.5, 0).setDisplaySize(cols * tile, height).setDepth(1)
+    if (world === 'dojo' || world === 'volcano') {
+      const marks = this.add.graphics().setDepth(1)
+      marks.fillStyle(0x000000, world === 'dojo' ? 0.16 : 0.22)
+      for (let x = 2; x < cols; x += 5) {
+        marks.fillRect(x * tile + 8, this.horizon + 28 + (x % 3) * 10, 3, 18 + (x % 4) * 6)
+      }
+    }
   }
 
   private topGroundRow(x: number): number {
@@ -432,35 +573,19 @@ class RunScene extends Phaser.Scene {
     return -1
   }
 
-  private fillBelowGround(tile: number, level: RunnerLevel) {
-    const paint = this.textures.exists('fill') ? 'fill' : this.textures.exists('ground') ? 'ground' : ''
-    if (!paint) return
-    const cols = level.rows[0].length
-    for (let x = 0; x < cols; x += 1) {
-      let lowest = -1
-      for (let y = 0; y < level.rows.length; y += 1) {
-        if (level.rows[y][x] === 'G') lowest = y
-      }
-      if (lowest < 0) continue
-      for (let y = (lowest + 1) * tile + tile / 2; y < 460; y += tile) {
-        this.add.image(x * tile + tile / 2, y, paint).setDisplaySize(tile + 2, tile + 2).setDepth(0)
-      }
-    }
-  }
-
-  private placeProps(tile: number, level: RunnerLevel) {
-    const ground = level.rows.findIndex((row) => row.includes('G'))
+  private placeProps(tile: number, level: RunnerLevel, ground: number) {
     if (ground < 0) return
     const cols = level.rows[0].length
     if (this.textures.exists('prop')) {
       for (let x = 8; x < cols; x += 14) {
-        this.add.image(x * tile, ground * tile + 4, 'prop').setOrigin(0.5, 1).setDisplaySize(110, 150).setDepth(2)
+        if (level.rows[ground][x] !== 'G') continue
+        this.add.image(x * tile, this.horizon, 'prop').setOrigin(0.5, 1).setDisplaySize(110, 150).setDepth(3)
       }
     }
     if (this.textures.exists('tuft')) {
       for (let x = 2; x < cols; x += 4) {
         if (level.rows[ground][x] !== 'G') continue
-        this.add.image(x * tile + tile / 2, ground * tile + 10, 'tuft').setOrigin(0.5, 1).setDisplaySize(34, 26).setDepth(3)
+        this.add.image(x * tile + tile / 2, this.horizon, 'tuft').setOrigin(0.5, 1).setDisplaySize(34, 26).setDepth(5)
       }
     }
   }
