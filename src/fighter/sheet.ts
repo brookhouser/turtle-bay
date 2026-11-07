@@ -13,47 +13,47 @@ export type PoseArt = {
 }
 
 // Kevin locked this sheet on Nov 6: white gi, orange trim, orange belt.
-// New poses are generated from public/fighters/dojo-ace/reference.jpg.
+// Poses are redrawn from the locked sheet onto a flat key color so the gi can be cut out cleanly.
 export const DOJO_ACE_POSES: PoseArt[] = [
   {
     id: 'ready',
     label: 'Ready stance',
-    file: 'fighters/dojo-ace/reference.jpg',
+    file: 'fighters/dojo-ace/reference.png',
     status: 'reference',
     usedBy: 'Dojo, tower defense idle, and the locked reference for every later pose',
   },
   {
     id: 'run',
     label: 'Run',
-    file: 'fighters/dojo-ace/run.jpg',
+    file: 'fighters/dojo-ace/run.png',
     status: 'from-sheet',
     usedBy: 'Platform runner, on the ground',
   },
   {
     id: 'jump',
     label: 'Jump',
-    file: 'fighters/dojo-ace/jump.jpg',
+    file: 'fighters/dojo-ace/jump.png',
     status: 'from-sheet',
     usedBy: 'Platform runner, in the air',
   },
   {
     id: 'dash',
     label: 'Dash',
-    file: 'fighters/dojo-ace/dash.jpg',
+    file: 'fighters/dojo-ace/dash.png',
     status: 'from-sheet',
     usedBy: 'Platform runner, slipping through spikes',
   },
   {
     id: 'spin-kick',
     label: 'Spin kick',
-    file: 'fighters/dojo-ace/spin-kick.jpg',
+    file: 'fighters/dojo-ace/spin-kick.png',
     status: 'from-sheet',
     usedBy: 'Tower defense special',
   },
   {
     id: 'retreat',
     label: 'Catch breath',
-    file: 'fighters/dojo-ace/retreat.jpg',
+    file: 'fighters/dojo-ace/retreat.png',
     status: 'from-sheet',
     usedBy: 'Tower defense, the few seconds back at the dojo',
   },

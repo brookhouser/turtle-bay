@@ -55,6 +55,8 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
   const [recent, setRecent] = useState<string[]>([])
   const [seed, setSeed] = useState(3)
   const [mapPrompt, setMapPrompt] = useState<MapPrompt | null>(unit.kind === 'map' ? nextMapPrompt(blankUnit(), [], 3, 'field') : null)
+  const [mapFeedback, setMapFeedback] = useState<string | null>(null)
+  const [showNames, setShowNames] = useState(false)
   const [wordQuestion, setWordQuestion] = useState<Question | null>(null)
   const [bossHp, setBossHp] = useState(8)
   const [pose, setPose] = useState<PoseId>('ready')
@@ -151,8 +153,18 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
     setRecent(nextRecent)
     const nextSeed = seed + 1
     setSeed(nextSeed)
-    askNext(nextSeed, nextRecent)
     setTyped('')
+    if (unit.kind === 'map' && mapPrompt) {
+      setMapFeedback(mapPrompt.name)
+      if (!correct) setBanner(`That country is ${mapPrompt.name}.`)
+      else if (!result?.justMastered && !fired.fired) setBanner(`${mapPrompt.name}. The names come back for a moment.`)
+      window.setTimeout(() => {
+        setMapFeedback(null)
+        askNext(nextSeed, nextRecent)
+      }, 1200)
+      return
+    }
+    askNext(nextSeed, nextRecent)
   }
 
   function onBoardPointer(event: PointerEvent<HTMLDivElement>) {
@@ -177,6 +189,7 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
       </div>
       <div
         className={`wave-board ${hero.retreated ? 'is-retreat' : ''}`}
+        style={unit.kind === 'map' ? undefined : { backgroundImage: `url(${import.meta.env.BASE_URL}runner/dojo/sky.jpg)` }}
         ref={boardRef}
         onPointerMove={onBoardPointer}
         onPointerUp={() => { drag.current = null }}
@@ -184,8 +197,10 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
         {unit.kind === 'map' ? (
           <MecaMapBoard
             view={mapView}
+            labels={showNames || mapFeedback !== null}
             highlightId={mapPrompt && mapPrompt.mode !== 'tap' ? mapPrompt.countryId : null}
             onTap={(id, quiz) => {
+              if (showNames || mapFeedback) return
               if (mapPrompt?.mode !== 'tap') return
               if (!quiz) {
                 setBanner('That country is on the map for context. It is not one of the 22.')
@@ -199,7 +214,15 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
           <polyline points={LANE.map((point) => `${point.x * 100},${point.y * 100}`).join(' ')} />
         </svg>
         {enemies.map((enemy) => (
-          <span key={enemy.id} className={enemy.boss ? 'enemy boss' : 'enemy'} style={{ left: `${enemy.x * 100}%`, top: `${enemy.y * 100}%` }} />
+          <span
+            key={enemy.id}
+            className={enemy.boss ? 'enemy boss' : 'enemy'}
+            style={{
+              left: `${enemy.x * 100}%`,
+              top: `${enemy.y * 100}%`,
+              backgroundImage: `url(${import.meta.env.BASE_URL}runner/td/${enemy.boss ? 'boss' : 'minion'}.png)`,
+            }}
+          />
         ))}
         <button
           type="button"
@@ -227,12 +250,23 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
       </ul>
       <p className="fine">Power {strikePower(progress)}. Credits do not change this.</p>
       {duel ? <p className="fine">Duel. Boss stamina {bossHp}. Each right answer lands a hit.</p> : null}
-      {unit.kind === 'map' && mapPrompt ? (
+      {unit.kind === 'map' ? (
+        <button type="button" className="btn" onClick={() => setShowNames((value) => !value)}>
+          {showNames ? 'Back to the quiz' : 'Learn the names'}
+        </button>
+      ) : null}
+      {unit.kind === 'map' && showNames ? <p className="fine">Names are on for studying. They hide again during a question.</p> : null}
+      {unit.kind === 'map' && mapFeedback ? (
+        <div className="question-card">
+          <h2>{mapFeedback}</h2>
+        </div>
+      ) : null}
+      {unit.kind === 'map' && mapPrompt && !showNames && !mapFeedback ? (
         <div className="question-card">
           {mapPrompt.mode === 'tap' ? <h2>Tap {mapPrompt.name}</h2> : null}
           {mapPrompt.mode === 'choice' ? (
             <>
-              <h2>{mapPrompt.name} is highlighted. Which country is it?</h2>
+              <h2>Which country is highlighted?</h2>
               <div className="choice-grid">
                 {mapPrompt.choices.map((choice) => (
                   <button key={choice.id} type="button" className="btn" onClick={() => resolve(choice.id === mapPrompt.countryId, false)}>{choice.label}</button>

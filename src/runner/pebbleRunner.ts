@@ -1,4 +1,4 @@
-import type { RunnerAbility, RunnerConfig } from './types'
+import type { RunnerAbility, RunnerConfig, RunnerScenery, RunnerWorld } from './types'
 import { PEBBLE_LEVELS } from './pebbleLevels'
 
 export const PEBBLE_ABILITIES: RunnerAbility[] = [
@@ -12,6 +12,17 @@ export const PEBBLE_ABILITIES: RunnerAbility[] = [
 function sprite(name: string): string {
   const base = import.meta.env.BASE_URL || '/'
   return `${base}sprites/pebble-${name}.png`
+}
+
+function worldArt(world: RunnerWorld): RunnerScenery {
+  const base = import.meta.env.BASE_URL || '/'
+  return {
+    sky: `${base}runner/pebble/${world}-sky.jpg`,
+    ground: `${base}runner/pebble/${world}-ground.png`,
+    ledge: `${base}runner/pebble/${world}-ledge.png`,
+    spike: `${base}runner/pebble/spike.png`,
+    prize: `${base}runner/pebble/shell.png`,
+  }
 }
 
 export function pebbleRunnerConfig(options: { hearts: number; hat?: string | null; scarf?: string | null }): RunnerConfig {
@@ -37,6 +48,11 @@ export function pebbleRunnerConfig(options: { hearts: number; hat?: string | nul
     holdBoost: 22,
     hearts: options.hearts,
     levels: PEBBLE_LEVELS,
+    scenery: {
+      beach: worldArt('beach'),
+      reef: worldArt('reef'),
+      volcano: worldArt('volcano'),
+    },
   }
 }
 

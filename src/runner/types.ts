@@ -29,6 +29,15 @@ export type RunnerLevel = {
   world?: RunnerWorld
 }
 
+export type RunnerScenery = {
+  sky: string
+  mid?: string
+  ground: string
+  ledge: string
+  spike: string
+  prize: string
+}
+
 export type RunnerConfig = {
   character: RunnerCharacter
   tile: number
@@ -37,4 +46,5 @@ export type RunnerConfig = {
   holdBoost: number
   hearts: number
   levels: RunnerLevel[]
+  scenery?: Partial<Record<RunnerWorld, RunnerScenery>>
 }

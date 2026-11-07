@@ -4,10 +4,12 @@ import { focusMap, MECA_GEOMETRY, MECA_MAP } from './meca'
 export function MecaMapBoard({
   view,
   highlightId,
+  labels,
   onTap,
 }: {
   view: string
   highlightId: string | null
+  labels: boolean
   onTap: (id: string, quiz: boolean) => void
 }) {
   const host = useRef<HTMLDivElement | null>(null)
@@ -18,7 +20,7 @@ export function MecaMapBoard({
     const parent = host.current
     if (!parent) return
     parent.replaceChildren()
-    const drawn = MECA_MAP.render(parent, MECA_GEOMETRY, { labels: true, width: 1100 })
+    const drawn = MECA_MAP.render(parent, MECA_GEOMETRY, { labels, width: 1100 })
     focusMap(drawn.svg, view)
     const zoom = MECA_MAP.attachPanZoom(drawn.wrap)
     const onClick = (event: Event) => {
@@ -33,7 +35,7 @@ export function MecaMapBoard({
       zoom.destroy()
       parent.replaceChildren()
     }
-  }, [view])
+  }, [view, labels])
 
   useEffect(() => {
     const svg = host.current?.querySelector('svg')

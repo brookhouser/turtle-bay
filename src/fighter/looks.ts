@@ -15,7 +15,7 @@ export const DOJO_ACE: FighterLook = {
   name: 'Dojo Ace',
   style: 'Karate',
   blurb: 'White gi, orange trim, orange belt. This is Sam\'s fighter.',
-  image: 'fighters/dojo-ace/reference.jpg',
+  image: 'fighters/dojo-ace/reference.png',
 }
 
 // Kept on disk only. They are not choices and not defaults.

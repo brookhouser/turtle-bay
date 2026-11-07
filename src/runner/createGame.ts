@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import type { RunnerAbilityId, RunnerConfig, RunnerLevel, RunnerWorld } from './types'
+import type { RunnerAbilityId, RunnerConfig, RunnerLevel, RunnerScenery, RunnerWorld } from './types'
 
 export type RunnerHooks = {
   onGate: () => void
@@ -72,6 +72,8 @@ class RunScene extends Phaser.Scene {
   private waiting = false
   private hearts: number
   private heartText!: Phaser.GameObjects.Text
+  private skyLayer?: Phaser.GameObjects.TileSprite
+  private midLayer?: Phaser.GameObjects.TileSprite
   private readonly ability: Set<RunnerAbilityId>
 
   constructor(options: MountOptions, bindResolve: (fn: (correct: boolean) => void) => void) {
@@ -91,6 +93,20 @@ class RunScene extends Phaser.Scene {
     const gear = this.options.config.character.gear
     if (gear?.hat) this.load.image('hat', gear.hat)
     if (gear?.scarf) this.load.image('scarf', gear.scarf)
+    const scenery = this.scenery()
+    if (scenery) {
+      this.load.image('sky', scenery.sky)
+      if (scenery.mid) this.load.image('mid', scenery.mid)
+      this.load.image('ground', scenery.ground)
+      this.load.image('ledge', scenery.ledge)
+      this.load.image('spike', scenery.spike)
+      this.load.image('prize', scenery.prize)
+    }
+  }
+
+  private scenery(): RunnerScenery | undefined {
+    const world = this.options.level.world ?? 'dojo'
+    return this.options.config.scenery?.[world]
   }
 
   create() {
@@ -99,6 +115,12 @@ class RunScene extends Phaser.Scene {
     const theme = THEMES[level.world ?? 'dojo']
     const cols = level.rows[0].length
     const worldH = Math.max(level.rows.length * tile, 420)
+    if (this.textures.exists('sky')) {
+      this.skyLayer = this.add.tileSprite(0, 0, 960, 420, 'sky').setOrigin(0, 0).setScrollFactor(0).setDepth(-30)
+    }
+    if (this.textures.exists('mid')) {
+      this.midLayer = this.add.tileSprite(0, 40, 960, 280, 'mid').setOrigin(0, 0).setScrollFactor(0).setDepth(-20)
+    }
     this.solids = this.physics.add.staticGroup()
     this.spikes = this.physics.add.staticGroup()
     this.shells = this.physics.add.group()
@@ -108,8 +130,10 @@ class RunScene extends Phaser.Scene {
         const px = x * tile + tile / 2
         const py = y * tile + tile / 2
         if (cell === 'G' || cell === '#' || cell === 'P' || cell === 'W') {
+          const key = cell === 'G' || cell === 'W' ? 'ground' : 'ledge'
           const color = cell === 'W' ? theme.wall : cell === 'G' ? theme.ground : theme.platform
-          const block = this.add.rectangle(px, py, tile - 2, tile - 2, color)
+          if (this.textures.exists(key)) this.add.image(px, py, key).setDisplaySize(tile, tile)
+          const block = this.add.rectangle(px, py, tile - 2, tile - 2, color, this.textures.exists(key) ? 0 : 1)
           this.physics.add.existing(block, true)
           this.solids.add(block)
           ;(block.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
@@ -124,20 +148,23 @@ class RunScene extends Phaser.Scene {
           this.movers.push({ node: platform, body, origin: px })
         }
         if (cell === '^') {
-          const spike = this.add.rectangle(px, py + 8, tile - 16, tile - 16, 0xb4234a)
+          if (this.textures.exists('spike')) this.add.image(px, py + 4, 'spike').setDisplaySize(tile - 6, tile - 4)
+          const spike = this.add.rectangle(px, py + 8, tile - 16, tile - 16, 0xb4234a, this.textures.exists('spike') ? 0 : 1)
           this.physics.add.existing(spike, true)
           this.spikes.add(spike)
           ;(spike.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
         }
         if (cell === 'S') {
-          const shell = this.add.circle(px, py, 10, 0xf2c14e)
+          if (this.textures.exists('prize')) this.add.image(px, py, 'prize').setDisplaySize(34, 34)
+          const shell = this.add.circle(px, py, 12, 0xf2c14e, this.textures.exists('prize') ? 0 : 1)
           this.physics.add.existing(shell)
           const body = shell.body as Phaser.Physics.Arcade.Body
           body.setAllowGravity(false)
-          body.setCircle(10)
+          body.setCircle(12)
           this.shells.add(shell)
         }
         if (cell === 'Q') {
+          if (this.textures.exists('prize')) this.add.image(px, py - tile, 'prize').setDisplaySize(36, 36)
           const gate = this.add.rectangle(px, py - 8, tile, tile * 3, 0xf0c14a, 0)
           this.physics.add.existing(gate, true)
           gates.push(gate)
@@ -231,6 +258,8 @@ class RunScene extends Phaser.Scene {
     const body = this.player.body as Phaser.Physics.Arcade.Body
     this.cameras.main.setFollowOffset(0, this.cameras.main.height / 2 - this.player.y)
     this.cameras.main.scrollY = 0
+    if (this.skyLayer) this.skyLayer.tilePositionX = this.cameras.main.scrollX * 0.15
+    if (this.midLayer) this.midLayer.tilePositionX = this.cameras.main.scrollX * 0.4
     if (this.waiting) {
       body.setVelocity(0, 0)
       return
@@ -311,6 +340,21 @@ class RunScene extends Phaser.Scene {
     body.setVelocityY(this.options.config.jump)
     this.jumps += 1
     this.holdFrames = 0
+    this.puff(this.player.x, this.player.y + 30)
+  }
+
+  private puff(x: number, y: number) {
+    for (let i = 0; i < 5; i += 1) {
+      const dot = this.add.circle(x, y, 4, 0xfff4e4, 0.9).setDepth(5)
+      this.tweens.add({
+        targets: dot,
+        x: x + (i - 2) * 12,
+        y: y - 18 - i * 3,
+        alpha: 0,
+        duration: 420,
+        onComplete: () => dot.destroy(),
+      })
+    }
   }
 
   private touchSpike() {

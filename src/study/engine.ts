@@ -202,6 +202,19 @@ export function pickWord(unit: StudyUnit, progress: UnitStudy, recent: string[],
   return pool[pool.length - 1]
 }
 
+function escapeReg(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/** Hide a term inside a clue so the sentence does not give the answer away. */
+export function concealTerm(text: string, term: string): string {
+  const cleaned = term.trim()
+  if (!cleaned) return text
+  const parts = cleaned.split(/\s+/).map(escapeReg)
+  const pattern = new RegExp(`(?<![A-Za-z0-9])${parts.join('\\s+')}(?![A-Za-z0-9])`, 'gi')
+  return text.replace(pattern, '____')
+}
+
 export function makeQuestion(unit: StudyUnit, word: StudyWord, seed: number): Question {
   const rand = mulberry32(seed)
   const others = unit.words.filter((item) => item.id !== word.id)
@@ -213,8 +226,11 @@ export function makeQuestion(unit: StudyUnit, word: StudyWord, seed: number): Qu
   }
   const askTerm = rand() < 0.5
   const choices = [
-    { id: word.id, label: askTerm ? word.definition : word.term },
-    ...distractors.map((item) => ({ id: item.id, label: askTerm ? item.definition : item.term })),
+    { id: word.id, label: askTerm ? concealTerm(word.definition, word.term) : word.term },
+    ...distractors.map((item) => ({
+      id: item.id,
+      label: askTerm ? concealTerm(item.definition, word.term) : item.term,
+    })),
   ]
   for (let i = choices.length - 1; i > 0; i -= 1) {
     const j = Math.floor(rand() * (i + 1))
@@ -222,9 +238,10 @@ export function makeQuestion(unit: StudyUnit, word: StudyWord, seed: number): Qu
     choices[i] = choices[j]
     choices[j] = swap
   }
+  const prompt = askTerm ? word.term : concealTerm(word.definition, word.term)
   return {
     wordId: word.id,
-    prompt: askTerm ? word.term : word.definition,
+    prompt,
     choices,
     answerId: word.id,
   }

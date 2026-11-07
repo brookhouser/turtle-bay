@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { STUDY_UNITS } from './content'
+import { PEBBLE_UNITS } from './pebbleUnits'
 import {
   applyAnswer,
   blankUnit,
+  concealTerm,
   makeQuestion,
   masteryRatio,
   pickWord,
@@ -62,6 +64,25 @@ describe('study mastery', () => {
     const picked = Array.from({ length: 80 }, (_, index) => pickWord(science, unit, recent, 1000 + index).id)
     expect(picked).toContain(shaky.id)
     expect(picked.some((id) => recent.includes(id))).toBe(false)
+  })
+
+  it('keeps the answer word out of a clue sentence', () => {
+    expect(concealTerm('We filled our plates at the buffet.', 'buffet')).toBe('We filled our plates at the ____.')
+    expect(concealTerm('Mom paid with a credit card.', 'credit')).toBe('Mom paid with a ____ card.')
+    const spelling = PEBBLE_UNITS[0]
+    for (const word of spelling.words) {
+      for (let seed = 0; seed < 8; seed += 1) {
+        const question = makeQuestion(spelling, word, seed)
+        const promptIsTheWord = question.prompt.trim().toLowerCase() === word.term.toLowerCase()
+        if (!promptIsTheWord) {
+          expect(question.prompt.toLowerCase().includes(word.term.toLowerCase())).toBe(false)
+        } else {
+          for (const choice of question.choices) {
+            expect(choice.label.toLowerCase().includes(word.term.toLowerCase())).toBe(false)
+          }
+        }
+      }
+    }
   })
 
   it('builds a question from the unit and never fails a wave', () => {
