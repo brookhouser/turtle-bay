@@ -60,6 +60,8 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
   const [wordQuestion, setWordQuestion] = useState<Question | null>(null)
   const [bossHp, setBossHp] = useState(8)
   const [pose, setPose] = useState<PoseId>('ready')
+  const [flash, setFlash] = useState<{ id: string; ok: boolean } | null>(null)
+  const [sparks, setSparks] = useState<Array<{ id: number; x: number; y: number }>>([])
   const drag = useRef<{ dx: number; dy: number } | null>(null)
   const boardRef = useRef<HTMLDivElement | null>(null)
   const heroRef = useRef(hero)
@@ -167,6 +169,23 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
     askNext(nextSeed, nextRecent)
   }
 
+  function choose(id: string, ok: boolean) {
+    if (flash) return
+    setFlash({ id, ok })
+    if (ok) {
+      setSparks(Array.from({ length: 7 }, (_, index) => ({
+        id: Date.now() + index,
+        x: hero.x * 100 + (index - 3) * 4,
+        y: hero.y * 100 - 6,
+      })))
+      window.setTimeout(() => setSparks([]), 520)
+    }
+    window.setTimeout(() => {
+      setFlash(null)
+      resolve(ok, false)
+    }, 420)
+  }
+
   function onBoardPointer(event: PointerEvent<HTMLDivElement>) {
     if (!drag.current || !boardRef.current) return
     const rect = boardRef.current.getBoundingClientRect()
@@ -187,14 +206,8 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
           )
         })}
       </div>
-      <div
-        className={`wave-board ${hero.retreated ? 'is-retreat' : ''}`}
-        style={unit.kind === 'map' ? undefined : { backgroundImage: `url(${import.meta.env.BASE_URL}runner/dojo/sky.jpg)` }}
-        ref={boardRef}
-        onPointerMove={onBoardPointer}
-        onPointerUp={() => { drag.current = null }}
-      >
-        {unit.kind === 'map' ? (
+      {unit.kind === 'map' ? (
+        <div className="atlas-panel">
           <MecaMapBoard
             view={mapView}
             labels={showNames || mapFeedback !== null}
@@ -209,10 +222,24 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
               resolve(id === mapPrompt.countryId, false)
             }}
           />
-        ) : null}
-        <svg className="wave-lane" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <polyline points={LANE.map((point) => `${point.x * 100},${point.y * 100}`).join(' ')} />
-        </svg>
+        </div>
+      ) : null}
+      <div
+        className={`wave-board ${unit.kind === 'map' ? 'battle-strip' : ''} ${hero.retreated ? 'is-retreat' : ''}`}
+        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}runner/td/courtyard.jpg)` }}
+        ref={boardRef}
+        onPointerMove={onBoardPointer}
+        onPointerUp={() => { drag.current = null }}
+      >
+        <div className="game-hud">
+          <span className="hud-label">Combo</span>
+          <div className="combo-meter" aria-label={`Combo ${hero.combo}`}>
+            <span style={{ width: `${hero.combo}%` }} />
+          </div>
+        </div>
+        <div className="dirt-run" style={{ left: '6%', width: '38%', top: '72%' }} />
+        <div className="dirt-rise" style={{ left: '40%', top: '28%', height: '44%' }} />
+        <div className="dirt-run" style={{ left: '40%', width: '52%', top: '28%' }} />
         {enemies.map((enemy) => (
           <span
             key={enemy.id}
@@ -223,6 +250,9 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
               backgroundImage: `url(${import.meta.env.BASE_URL}runner/td/${enemy.boss ? 'boss' : 'minion'}.png)`,
             }}
           />
+        ))}
+        {sparks.map((spark) => (
+          <span key={spark.id} className="hit-spark" style={{ left: `${spark.x}%`, top: `${spark.y}%` }} />
         ))}
         <button
           type="button"
@@ -235,11 +265,8 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
           }}
         >
           <img src={poseSrc(poseNow)} alt="" />
-          <span>{hero.retreated ? 'Dojo' : 'Hero'}</span>
+          <span className="nameplate">{hero.retreated ? 'Dojo' : 'Ace'}</span>
         </button>
-        <div className="combo-meter" aria-label={`Combo ${hero.combo}`}>
-          <span style={{ width: `${hero.combo}%` }} />
-        </div>
       </div>
       <p className="banner">{banner}</p>
       <ul className="skill-row">
@@ -269,7 +296,7 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
               <h2>Which country is highlighted?</h2>
               <div className="choice-grid">
                 {mapPrompt.choices.map((choice) => (
-                  <button key={choice.id} type="button" className="btn" onClick={() => resolve(choice.id === mapPrompt.countryId, false)}>{choice.label}</button>
+                  <button key={choice.id} type="button" className={`btn quiz-choice ${flash?.id === choice.id ? (flash.ok ? 'is-right' : 'is-wrong') : ''}`} onClick={() => choose(choice.id, choice.id === mapPrompt.countryId)}>{choice.label}</button>
                 ))}
               </div>
             </>
@@ -293,7 +320,7 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
           <h2>{wordQuestion.prompt}</h2>
           <div className="choice-grid">
             {wordQuestion.choices.map((choice) => (
-              <button key={choice.id} type="button" className="btn" onClick={() => resolve(choice.id === wordQuestion.answerId, false)}>{choice.label}</button>
+              <button key={choice.id} type="button" className={`btn quiz-choice ${flash?.id === choice.id ? (flash.ok ? 'is-right' : 'is-wrong') : ''}`} onClick={() => choose(choice.id, choice.id === wordQuestion.answerId)}>{choice.label}</button>
             ))}
           </div>
         </div>

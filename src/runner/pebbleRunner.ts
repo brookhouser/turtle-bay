@@ -16,12 +16,15 @@ function sprite(name: string): string {
 
 function worldArt(world: RunnerWorld): RunnerScenery {
   const base = import.meta.env.BASE_URL || '/'
+  const prop = world === 'beach' ? 'palm.png' : world === 'reef' ? 'coral.png' : ''
   return {
     sky: `${base}runner/pebble/${world}-sky.jpg`,
-    ground: `${base}runner/pebble/${world}-ground.png`,
-    ledge: `${base}runner/pebble/${world}-ledge.png`,
+    ground: `${base}runner/pebble/${world === 'beach' ? 'dune-top' : world === 'reef' ? 'reef-top' : 'volcano-top'}.png`,
+    fill: `${base}runner/pebble/${world === 'beach' ? 'dune-fill' : world === 'reef' ? 'reef-fill' : 'volcano-fill'}.png`,
+    ledge: `${base}runner/pebble/${world === 'beach' ? 'dune-fill' : world === 'reef' ? 'reef-fill' : 'volcano-fill'}.png`,
     spike: `${base}runner/pebble/spike.png`,
     prize: `${base}runner/pebble/shell.png`,
+    prop: prop ? `${base}runner/pebble/${prop}` : undefined,
   }
 }
 

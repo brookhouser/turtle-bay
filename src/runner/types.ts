@@ -32,10 +32,13 @@ export type RunnerLevel = {
 export type RunnerScenery = {
   sky: string
   mid?: string
+  front?: string
   ground: string
+  fill?: string
   ledge: string
   spike: string
   prize: string
+  prop?: string
 }
 
 export type RunnerConfig = {

@@ -8,9 +8,9 @@ function art(file: string): string {
 
 const DOJO_SCENERY: RunnerScenery = {
   sky: art('dojo/sky.jpg'),
-  mid: art('dojo/mid.png'),
-  ground: art('dojo/ground.png'),
-  ledge: art('dojo/ledge.png'),
+  ground: art('dojo/beam.png'),
+  fill: art('dojo/beam.png'),
+  ledge: art('dojo/beam.png'),
   spike: art('dojo/spike.png'),
   prize: art('dojo/medal.png'),
 }

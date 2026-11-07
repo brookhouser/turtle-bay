@@ -5,6 +5,8 @@ export type RunnerHooks = {
   onGate: () => void
   onStatus: (message: string) => void
   onShell?: () => void
+  onHearts?: (hearts: number) => void
+  onProgress?: (progress: number) => void
 }
 
 export type RunnerHandle = {
@@ -71,9 +73,9 @@ class RunScene extends Phaser.Scene {
   private gateOpen = false
   private waiting = false
   private hearts: number
-  private heartText!: Phaser.GameObjects.Text
-  private skyLayer?: Phaser.GameObjects.TileSprite
-  private midLayer?: Phaser.GameObjects.TileSprite
+  private reported = 0
+  private skyImage?: Phaser.GameObjects.Image
+  private frontImage?: Phaser.GameObjects.Image
   private readonly ability: Set<RunnerAbilityId>
 
   constructor(options: MountOptions, bindResolve: (fn: (correct: boolean) => void) => void) {
@@ -96,11 +98,13 @@ class RunScene extends Phaser.Scene {
     const scenery = this.scenery()
     if (scenery) {
       this.load.image('sky', scenery.sky)
-      if (scenery.mid) this.load.image('mid', scenery.mid)
+      if (scenery.front) this.load.image('front', scenery.front)
       this.load.image('ground', scenery.ground)
+      if (scenery.fill) this.load.image('fill', scenery.fill)
       this.load.image('ledge', scenery.ledge)
       this.load.image('spike', scenery.spike)
       this.load.image('prize', scenery.prize)
+      if (scenery.prop) this.load.image('prop', scenery.prop)
     }
   }
 
@@ -116,10 +120,12 @@ class RunScene extends Phaser.Scene {
     const cols = level.rows[0].length
     const worldH = Math.max(level.rows.length * tile, 420)
     if (this.textures.exists('sky')) {
-      this.skyLayer = this.add.tileSprite(0, 0, 960, 420, 'sky').setOrigin(0, 0).setScrollFactor(0).setDepth(-30)
+      this.skyImage = this.add.image(0, 0, 'sky').setOrigin(0, 0).setScrollFactor(0).setDepth(-30)
+      this.skyImage.setDisplaySize(1800, 420)
     }
-    if (this.textures.exists('mid')) {
-      this.midLayer = this.add.tileSprite(0, 40, 960, 280, 'mid').setOrigin(0, 0).setScrollFactor(0).setDepth(-20)
+    if (this.textures.exists('front')) {
+      this.frontImage = this.add.image(0, 300, 'front').setOrigin(0, 0).setScrollFactor(0).setDepth(6)
+      this.frontImage.setDisplaySize(1800, 140)
     }
     this.solids = this.physics.add.staticGroup()
     this.spikes = this.physics.add.staticGroup()
@@ -130,10 +136,15 @@ class RunScene extends Phaser.Scene {
         const px = x * tile + tile / 2
         const py = y * tile + tile / 2
         if (cell === 'G' || cell === '#' || cell === 'P' || cell === 'W') {
-          const key = cell === 'G' || cell === 'W' ? 'ground' : 'ledge'
+          const surface = this.topSolidRow(x)
+          const key = y === surface ? (cell === 'G' || cell === 'W' ? 'ground' : 'ledge') : 'fill'
+          const paint = this.textures.exists(key) ? key : this.textures.exists('ground') ? 'ground' : ''
+          if (paint) {
+            const art = this.add.image(px, py, paint).setDisplaySize(tile + 2, tile + 8).setDepth(1)
+            if (y === surface) art.setOrigin(0.5, 0.72)
+          }
           const color = cell === 'W' ? theme.wall : cell === 'G' ? theme.ground : theme.platform
-          if (this.textures.exists(key)) this.add.image(px, py, key).setDisplaySize(tile, tile)
-          const block = this.add.rectangle(px, py, tile - 2, tile - 2, color, this.textures.exists(key) ? 0 : 1)
+          const block = this.add.rectangle(px, py, tile - 2, tile - 2, color, paint ? 0 : 1)
           this.physics.add.existing(block, true)
           this.solids.add(block)
           ;(block.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
@@ -148,15 +159,16 @@ class RunScene extends Phaser.Scene {
           this.movers.push({ node: platform, body, origin: px })
         }
         if (cell === '^') {
-          if (this.textures.exists('spike')) this.add.image(px, py + 4, 'spike').setDisplaySize(tile - 6, tile - 4)
+          if (this.textures.exists('spike')) this.add.image(px, py + tile / 2, 'spike').setOrigin(0.5, 1).setDisplaySize(26, 54).setDepth(3)
           const spike = this.add.rectangle(px, py + 8, tile - 16, tile - 16, 0xb4234a, this.textures.exists('spike') ? 0 : 1)
           this.physics.add.existing(spike, true)
           this.spikes.add(spike)
           ;(spike.body as Phaser.Physics.Arcade.StaticBody).updateFromGameObject()
         }
         if (cell === 'S') {
-          if (this.textures.exists('prize')) this.add.image(px, py, 'prize').setDisplaySize(34, 34)
-          const shell = this.add.circle(px, py, 12, 0xf2c14e, this.textures.exists('prize') ? 0 : 1)
+          const token = this.textures.exists('prize') ? this.add.image(px, py, 'prize').setDisplaySize(34, 34).setDepth(2) : null
+          const shell = this.add.circle(px, py, 12, 0xf2c14e, token ? 0 : 1)
+          shell.setData('token', token)
           this.physics.add.existing(shell)
           const body = shell.body as Phaser.Physics.Arcade.Body
           body.setAllowGravity(false)
@@ -173,11 +185,14 @@ class RunScene extends Phaser.Scene {
     })
     this.solids.refresh()
     this.spikes.refresh()
+    this.fillBelowGround(tile, level)
+    this.placeProps(tile, level)
     const ground = level.rows.findIndex((row) => row.includes('G'))
     this.player = this.physics.add.sprite(tile * 2, ground * tile - tile, 'run')
     const frameW = this.player.width
     const frameH = this.player.height
     this.player.setDisplaySize(72, 96)
+    this.player.setDepth(4)
     this.player.setCollideWorldBounds(false)
     const body = this.player.body as Phaser.Physics.Arcade.Body
     const bodyW = 36 / this.player.scaleX
@@ -199,6 +214,8 @@ class RunScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.shells, (_player, shell) => {
       const item = shell as Phaser.GameObjects.Arc
       if (!item.active) return
+      const token = item.getData('token') as Phaser.GameObjects.Image | null
+      token?.destroy()
       item.destroy()
       this.options.hooks.onShell?.()
       this.options.hooks.onStatus('A shell for the pantry.')
@@ -219,8 +236,8 @@ class RunScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, 0.12, 0)
     this.cameras.main.scrollY = 0
     this.physics.world.setBounds(0, 0, cols * tile, level.rows.length * tile + 200)
-    this.heartText = this.add.text(16, 12, '', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '22px', color: '#1c1915' }).setScrollFactor(0)
-    this.paintHearts()
+    this.options.hooks.onHearts?.(this.hearts)
+    this.options.hooks.onProgress?.(0)
     this.bindResolve((correct) => {
       this.waiting = false
       if (correct) {
@@ -258,8 +275,21 @@ class RunScene extends Phaser.Scene {
     const body = this.player.body as Phaser.Physics.Arcade.Body
     this.cameras.main.setFollowOffset(0, this.cameras.main.height / 2 - this.player.y)
     this.cameras.main.scrollY = 0
-    if (this.skyLayer) this.skyLayer.tilePositionX = this.cameras.main.scrollX * 0.15
-    if (this.midLayer) this.midLayer.tilePositionX = this.cameras.main.scrollX * 0.4
+    const scroll = this.cameras.main.scrollX
+    if (this.skyImage) {
+      const maxShift = Math.max(0, this.skyImage.displayWidth - 960)
+      this.skyImage.x = -Math.min(maxShift, scroll * 0.18)
+    }
+    if (this.frontImage) {
+      const maxShift = Math.max(0, this.frontImage.displayWidth - 960)
+      this.frontImage.x = -Math.min(maxShift, scroll * 0.55)
+    }
+    const span = Math.max(1, this.options.level.rows[0].length * this.options.config.tile - 960)
+    const next = Math.min(1, scroll / span)
+    if (Math.abs(next - this.reported) > 0.02) {
+      this.reported = next
+      this.options.hooks.onProgress?.(next)
+    }
     if (this.waiting) {
       body.setVelocity(0, 0)
       return
@@ -328,7 +358,42 @@ class RunScene extends Phaser.Scene {
   }
 
   private paintHearts() {
-    this.heartText.setText(`${'♥'.repeat(this.hearts)} ${this.hearts === 1 ? 'heart' : 'hearts'}`)
+    this.options.hooks.onHearts?.(this.hearts)
+  }
+
+  private topSolidRow(x: number): number {
+    const rows = this.options.level.rows
+    for (let y = 0; y < rows.length; y += 1) {
+      const cell = rows[y][x]
+      if (cell === 'G' || cell === '#' || cell === 'P' || cell === 'W') return y
+    }
+    return -1
+  }
+
+  private fillBelowGround(tile: number, level: RunnerLevel) {
+    const paint = this.textures.exists('fill') ? 'fill' : this.textures.exists('ground') ? 'ground' : ''
+    if (!paint) return
+    const cols = level.rows[0].length
+    for (let x = 0; x < cols; x += 1) {
+      let lowest = -1
+      for (let y = 0; y < level.rows.length; y += 1) {
+        if (level.rows[y][x] === 'G') lowest = y
+      }
+      if (lowest < 0) continue
+      for (let y = (lowest + 1) * tile + tile / 2; y < 460; y += tile) {
+        this.add.image(x * tile + tile / 2, y, paint).setDisplaySize(tile + 2, tile + 2).setDepth(0)
+      }
+    }
+  }
+
+  private placeProps(tile: number, level: RunnerLevel) {
+    if (!this.textures.exists('prop')) return
+    const ground = level.rows.findIndex((row) => row.includes('G'))
+    if (ground < 0) return
+    const cols = level.rows[0].length
+    for (let x = 8; x < cols; x += 14) {
+      this.add.image(x * tile, ground * tile + 4, 'prop').setOrigin(0.5, 1).setDisplaySize(110, 150).setDepth(2)
+    }
   }
 
   private tryJump() {

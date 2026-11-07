@@ -37,6 +37,9 @@ export function RunnerScreen({
   const [gate, setGate] = useState<Question | null>(null)
   const [gateUnit, setGateUnit] = useState(units[0]?.id ?? '')
   const [unlock, setUnlock] = useState<string | null>(null)
+  const [hearts, setHearts] = useState(config.hearts)
+  const [runProgress, setRunProgress] = useState(0)
+  const [flash, setFlash] = useState<string | null>(null)
   const recent = useRef<string[]>([])
   const seed = useRef(4)
   const studyRef = useRef(kid?.study)
@@ -76,6 +79,8 @@ export function RunnerScreen({
         hooks: {
           onStatus: setStatus,
           onShell,
+          onHearts: setHearts,
+          onProgress: setRunProgress,
           onGate: () => {
             const currentUnits = unitsRef.current
             const picked = pickRunnerWord(currentUnits, studyRef.current ?? { units: {} }, recent.current, seed.current)
@@ -99,11 +104,16 @@ export function RunnerScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zone])
 
-  function answer(correct: boolean) {
-    if (!gate) return
-    answerStudy(gateUnit, gate.wordId, correct)
-    handle.current?.resolveGate(correct)
-    setGate(null)
+  function answer(id: string) {
+    if (!gate || flash) return
+    const correct = id === gate.answerId
+    setFlash(id)
+    window.setTimeout(() => {
+      answerStudy(gateUnit, gate.wordId, correct)
+      handle.current?.resolveGate(correct)
+      setGate(null)
+      setFlash(null)
+    }, 380)
   }
 
   const upcoming = nextAbility(mastered, abilities)
@@ -127,12 +137,21 @@ export function RunnerScreen({
       </div>
       <div className="runner-play">
         <RunnerStage host={host} />
+        <div className="run-hud">
+          <div className="run-hearts" aria-label={`${hearts} hearts`}>
+            {Array.from({ length: Math.max(hearts, 1) }, (_, index) => (
+              <img key={index} src={`${import.meta.env.BASE_URL}runner/hud/heart.png`} alt="" />
+            ))}
+          </div>
+          <div className="run-bar" aria-label="Course progress"><span style={{ width: `${Math.round(runProgress * 100)}%` }} /></div>
+          <div className="run-coins">{kid.motivation === 'fighter' ? `${kid.credits} cr` : `${Math.round(kid.turtle.coins)}`}</div>
+        </div>
         {gate ? (
-          <div className="question-card gate-card" role="dialog" aria-label="Question gate">
+          <div className="question-card gate-card quiz-card" role="dialog" aria-label="Question gate">
             <h2>{gate.prompt}</h2>
             <div className="choice-grid">
               {gate.choices.map((choice) => (
-                <button key={choice.id} type="button" className="btn" onClick={() => answer(choice.id === gate.answerId)}>{choice.label}</button>
+                <button key={choice.id} type="button" className={`btn quiz-choice ${flash === choice.id ? (choice.id === gate.answerId ? 'is-right' : 'is-wrong') : ''}`} onClick={() => answer(choice.id)}>{choice.label}</button>
               ))}
             </div>
           </div>
