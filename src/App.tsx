@@ -14,15 +14,31 @@ import { NamePage } from './pages/NamePage'
 import { ParentPage } from './pages/ParentPage'
 import { ShopPage } from './pages/ShopPage'
 import { SpellingPage } from './pages/SpellingPage'
+import { StudyPage } from './pages/StudyPage'
+import { StudyPlayPage } from './pages/StudyPlayPage'
+import { DojoPage } from './pages/DojoPage'
+import { RunnerPage } from './pages/RunnerPage'
+import { PebbleRunPage } from './pages/PebbleRunPage'
+import { SchoolPage } from './pages/SchoolPage'
 import type { ReactNode } from 'react'
 
-function KidGate({ children, named = false }: { children: ReactNode; named?: boolean }) {
+function KidGate({ children, named = false, kind = 'turtle' }: { children: ReactNode; named?: boolean; kind?: 'turtle' | 'fighter' }) {
   const { ready, session, kid } = useBay()
   if (!ready) return <p className="app-loading">Opening the bay...</p>
   if (!session || session.role !== 'kid' || !kid) return <Navigate to="/" replace />
-  if (named && !kid.turtle.named) return <Navigate to="/name" replace />
-  if (!named && kid.turtle.named) return <Navigate to="/home" replace />
+  if (session.scope === 'school') return <Navigate to="/school" replace />
+  if (kind === 'turtle' && kid.motivation === 'fighter') return <Navigate to="/study" replace />
+  if (kind === 'fighter' && kid.motivation !== 'fighter') return <Navigate to="/home" replace />
+  if (kind === 'turtle' && named && !kid.turtle.named) return <Navigate to="/name" replace />
+  if (kind === 'turtle' && !named && kid.turtle.named) return <Navigate to="/home" replace />
   return children
+}
+
+function SchoolGate({ children }: { children: ReactNode }) {
+  const { ready, session, kid } = useBay()
+  if (!ready) return <p className="app-loading">Opening the bay...</p>
+  if (!session || session.role !== 'kid' || session.scope !== 'school' || !kid) return <Navigate to="/" replace />
+  return <AppShell>{children}</AppShell>
 }
 
 function ParentGate({ children }: { children: ReactNode }) {
@@ -50,6 +66,13 @@ function RoutesView() {
       <Route path="/shop" element={<KidGate named><AppShell><ShopPage /></AppShell></KidGate>} />
       <Route path="/care" element={<KidGate named><AppShell><CarePage /></AppShell></KidGate>} />
       <Route path="/habitat" element={<KidGate named><AppShell><HabitatPage /></AppShell></KidGate>} />
+      <Route path="/study" element={<KidGate kind="fighter"><AppShell><StudyPage /></AppShell></KidGate>} />
+      <Route path="/study/:unitId" element={<KidGate kind="fighter"><AppShell><StudyPlayPage /></AppShell></KidGate>} />
+      <Route path="/dojo" element={<KidGate kind="fighter"><AppShell><DojoPage /></AppShell></KidGate>} />
+      <Route path="/runner" element={<KidGate kind="fighter"><AppShell><RunnerPage /></AppShell></KidGate>} />
+      <Route path="/pebble-run" element={<KidGate named><AppShell><PebbleRunPage /></AppShell></KidGate>} />
+      <Route path="/school" element={<SchoolGate><SchoolPage /></SchoolGate>} />
+      <Route path="/school/run" element={<SchoolGate><PebbleRunPage /></SchoolGate>} />
       <Route path="/parent" element={<ParentGate><ParentPage /></ParentGate>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

@@ -1,7 +1,9 @@
+import type { World } from '../family/model'
 import type { SaveData, SessionData } from '../types'
 
 const SAVE_KEY = 'turtlebay.save.v1'
 const SESSION_KEY = 'turtlebay.session.v1'
+const WORLD_KEY = 'turtlebay.world.v1'
 
 export function loadSave(): SaveData {
   try {
@@ -24,8 +26,17 @@ export function loadSession(): SessionData | null {
     const raw = localStorage.getItem(SESSION_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw) as SessionData
-    if (!parsed || (parsed.role !== 'kid' && parsed.role !== 'parent')) return null
-    return parsed
+    if (!parsed || typeof parsed !== 'object') return null
+    if (parsed.role === 'parent' && typeof parsed.familyId === 'string' && typeof parsed.email === 'string') return parsed
+    if (
+      parsed.role === 'kid'
+      && typeof parsed.familyId === 'string'
+      && typeof parsed.kidId === 'string'
+      && typeof parsed.email === 'string'
+    ) {
+      return { ...parsed, scope: parsed.scope === 'school' ? 'school' : 'family' }
+    }
+    return null
   } catch {
     return null
   }
@@ -41,4 +52,21 @@ export function persistSession(session: SessionData | null) {
 
 export function clearSave() {
   localStorage.removeItem(SAVE_KEY)
+  localStorage.removeItem(WORLD_KEY)
+}
+
+export function loadWorld(): World | null {
+  try {
+    const raw = localStorage.getItem(WORLD_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as World
+    if (!parsed || !Array.isArray(parsed.families) || !Array.isArray(parsed.kids)) return null
+    return parsed
+  } catch {
+    return null
+  }
+}
+
+export function persistWorld(world: World) {
+  localStorage.setItem(WORLD_KEY, JSON.stringify(world))
 }

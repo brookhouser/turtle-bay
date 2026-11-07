@@ -19,6 +19,7 @@ import {
 import { currentItemId, findItem, HABITATS } from '../data/catalog'
 import { LESSONS, nextLesson } from '../data/curriculum'
 import { localDay, shiftDay } from '../lib/format'
+import { blankStudy } from '../study/engine'
 import type {
   ChallengeDraft,
   CustomChallenge,
@@ -75,8 +76,15 @@ export function blankLessons(): Record<string, LessonProgress> {
 export function createKid(nickname: string, pinHash: string, id: string = crypto.randomUUID(), now = Date.now()): KidProfile {
   return {
     id,
+    familyId: 'turtlebay',
     nickname: nickname.trim(),
+    email: '',
+    grade: '',
+    motivation: 'turtle',
+    archived: false,
+    groupIds: [],
     pinHash,
+    credits: 0,
     turtle: {
       name: '',
       named: false,
@@ -95,6 +103,13 @@ export function createKid(nickname: string, pinHash: string, id: string = crypto
     spellingSessions: [],
     customChallenges: [],
     practiceDays: [],
+    tasks: [],
+    routines: [],
+    assignments: [],
+    completions: [],
+    fighter: null,
+    editHistory: [],
+    study: blankStudy(),
     createdAt: new Date(now).toISOString(),
   }
 }
@@ -142,19 +157,43 @@ export function normalizeKid(input: Partial<KidProfile> & { id: string; nickname
     lastTick: input.turtle?.lastTick ?? fresh.turtle.lastTick,
     lastPetAt: input.turtle?.lastPetAt ?? 0,
   }
+  const motivation = input.motivation === 'fighter' ? 'fighter' : 'turtle'
   return {
     ...fresh,
     ...input,
     id: input.id,
+    familyId: input.familyId || fresh.familyId,
     nickname: input.nickname,
+    email: typeof input.email === 'string' ? input.email.trim().toLowerCase() : '',
+    grade: typeof input.grade === 'string' ? input.grade : '',
+    motivation,
+    archived: Boolean(input.archived),
+    groupIds: Array.isArray(input.groupIds) ? input.groupIds.filter((id) => typeof id === 'string') : [],
     pinHash: input.pinHash ?? '',
+    credits: Math.max(0, Math.round(input.credits ?? 0)),
     turtle,
     lessons,
     sessions: Array.isArray(input.sessions) ? input.sessions.slice(0, 40) : [],
     spellingSessions: asSpellingSessions(input.spellingSessions),
     customChallenges: Array.isArray(input.customChallenges) ? input.customChallenges : [],
     practiceDays: Array.isArray(input.practiceDays) ? input.practiceDays : [],
+    tasks: Array.isArray(input.tasks) ? input.tasks : [],
+    routines: Array.isArray(input.routines) ? input.routines : [],
+    assignments: Array.isArray(input.assignments) ? input.assignments : [],
+    completions: Array.isArray(input.completions) ? input.completions : [],
+    fighter: motivation === 'fighter' ? normalizeFighter(input.fighter) : null,
+    editHistory: Array.isArray(input.editHistory) ? input.editHistory : [],
+    study: input.study && typeof input.study === 'object' && input.study.units ? input.study : blankStudy(),
     createdAt: input.createdAt ?? fresh.createdAt,
+  }
+}
+
+function normalizeFighter(value: KidProfile['fighter'] | null | undefined): NonNullable<KidProfile['fighter']> {
+  return {
+    lookId: 'dojo-ace',
+    unlocked: Array.isArray(value?.unlocked) && value.unlocked.length > 0 ? value.unlocked : ['move-ready', 'move-bow'],
+    equippedGear: Array.isArray(value?.equippedGear) ? value.equippedGear : [],
+    portraitUrl: value?.portraitUrl ?? null,
   }
 }
 
@@ -192,6 +231,23 @@ export function petTurtle(kid: KidProfile, now = Date.now()): { kid: KidProfile;
       },
     },
   }
+}
+
+export function bankShellTreats(kid: KidProfile, count = 1): KidProfile {
+  const snacks = Math.max(1, Math.round(count))
+  const inventory = { ...kid.turtle.inventory }
+  inventory['kelp-chip'] = (inventory['kelp-chip'] ?? 0) + snacks
+  return {
+    kid: {
+      ...kid,
+      turtle: {
+        ...kid.turtle,
+        inventory,
+        hunger: clampMeter(kid.turtle.hunger + snacks * 4),
+        happy: clampMeter(kid.turtle.happy + snacks * 2),
+      },
+    },
+  }.kid
 }
 
 export function feedTurtle(kid: KidProfile, snackId?: string, now = Date.now()): { kid: KidProfile; error?: string } {
