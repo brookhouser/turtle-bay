@@ -20,7 +20,8 @@ export function MecaMapBoard({
     const parent = host.current
     if (!parent) return
     parent.replaceChildren()
-    const drawn = MECA_MAP.render(parent, MECA_GEOMETRY, { labels, width: 1100 })
+    const sea = `${import.meta.env.BASE_URL}runner/atlas/sea.jpg`
+    const drawn = MECA_MAP.render(parent, MECA_GEOMETRY, { labels, width: 1100, sea })
     focusMap(drawn.svg, view)
     const zoom = MECA_MAP.attachPanZoom(drawn.wrap)
     const onClick = (event: Event) => {
@@ -41,6 +42,8 @@ export function MecaMapBoard({
     const svg = host.current?.querySelector('svg')
     if (!svg) return
     svg.querySelectorAll('.meca-selected').forEach((node) => node.classList.remove('meca-selected'))
+    const wrap = svg.parentElement
+    wrap?.classList.toggle('meca-asking', Boolean(highlightId))
     if (!highlightId) return
     svg.querySelectorAll(`[data-id="${highlightId}"]`).forEach((node) => node.classList.add('meca-selected'))
   }, [highlightId, view])

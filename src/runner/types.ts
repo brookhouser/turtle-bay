@@ -36,6 +36,10 @@ export type RunnerScenery = {
   ground: string
   fill?: string
   ledge: string
+  capLeft?: string
+  capRight?: string
+  support?: string
+  tuft?: string
   spike: string
   prize: string
   prop?: string

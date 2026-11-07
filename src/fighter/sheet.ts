@@ -57,12 +57,12 @@ export const DOJO_ACE_POSES: PoseArt[] = [
     status: 'from-sheet',
     usedBy: 'Tower defense, the few seconds back at the dojo',
   },
-  { id: 'palm-burst', label: 'Palm burst', file: null, status: 'needed', usedBy: 'Second skill slot' },
+  { id: 'palm-burst', label: 'Palm burst', file: 'fighters/dojo-ace/palm-burst.png', status: 'from-sheet', usedBy: 'Second skill slot' },
   { id: 'team-up', label: 'Tower team-up', file: null, status: 'needed', usedBy: 'Team-up combo' },
   { id: 'super', label: 'Super', file: null, status: 'needed', usedBy: 'Hard-mode super' },
-  { id: 'duel', label: 'Duel guard', file: null, status: 'needed', usedBy: 'Boss duel' },
-  { id: 'slide', label: 'Runner slide', file: null, status: 'needed', usedBy: 'Platform runner' },
-  { id: 'dance', label: 'Victory dances', file: null, status: 'needed', usedBy: 'Cosmetic emotes' },
+  { id: 'duel', label: 'Duel guard', file: 'fighters/dojo-ace/guard.png', status: 'from-sheet', usedBy: 'Boss duel' },
+  { id: 'slide', label: 'Runner slide', file: 'fighters/dojo-ace/slide.png', status: 'from-sheet', usedBy: 'Platform runner' },
+  { id: 'dance', label: 'Victory dances', file: 'fighters/dojo-ace/victory.png', status: 'from-sheet', usedBy: 'Cosmetic emotes' },
   { id: 'skins', label: 'Skins and belt colors', file: null, status: 'needed', usedBy: 'Cosmetic credit shop, each one against this sheet' },
 ]
 

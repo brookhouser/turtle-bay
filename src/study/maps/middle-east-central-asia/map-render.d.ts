@@ -28,7 +28,7 @@ declare const api: {
   project: (lon: number, lat: number) => [number, number]
   hitTest: (fc: MecaCollection, lon: number, lat: number, opt?: { quizOnly?: boolean }) => MecaFeature | null
   pathFromGeometry: (geometry: MecaFeature['geometry'], originX: number, originY: number, scale: number) => string
-  render: (container: HTMLElement, fc: MecaCollection, options?: { labels?: boolean; width?: number; quizOnly?: boolean }) => MecaDraw
+  render: (container: HTMLElement, fc: MecaCollection, options?: { labels?: boolean; width?: number; quizOnly?: boolean; sea?: string }) => MecaDraw
   attachPanZoom: (wrap: HTMLElement) => { destroy: () => void; reset: () => void }
 }
 

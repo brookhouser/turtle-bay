@@ -16,12 +16,20 @@ function sprite(name: string): string {
 
 function worldArt(world: RunnerWorld): RunnerScenery {
   const base = import.meta.env.BASE_URL || '/'
+  const edge = world === 'beach' ? 'grass-edge' : world === 'reef' ? 'reef-edge' : 'lava-edge'
+  const fill = world === 'beach' ? 'sand-fill' : world === 'reef' ? 'reef-fill2' : 'ash-fill'
+  const cap = world === 'beach' ? 'sand' : world === 'reef' ? 'reef' : 'lava'
   const prop = world === 'beach' ? 'palm.png' : world === 'reef' ? 'coral.png' : ''
   return {
     sky: `${base}runner/pebble/${world}-sky.jpg`,
-    ground: `${base}runner/pebble/${world === 'beach' ? 'dune-top' : world === 'reef' ? 'reef-top' : 'volcano-top'}.png`,
-    fill: `${base}runner/pebble/${world === 'beach' ? 'dune-fill' : world === 'reef' ? 'reef-fill' : 'volcano-fill'}.png`,
-    ledge: `${base}runner/pebble/${world === 'beach' ? 'dune-fill' : world === 'reef' ? 'reef-fill' : 'volcano-fill'}.png`,
+    mid: `${base}runner/pebble/${world}-mid.png`,
+    front: `${base}runner/pebble/${world}-front.png`,
+    ground: `${base}runner/pebble/${edge}.png`,
+    fill: `${base}runner/pebble/${fill}.png`,
+    ledge: `${base}runner/pebble/${edge}.png`,
+    capLeft: `${base}runner/pebble/${cap}-cap-l.png`,
+    capRight: `${base}runner/pebble/${cap}-cap-r.png`,
+    tuft: world === 'beach' ? `${base}runner/pebble/grass-tuft.png` : undefined,
     spike: `${base}runner/pebble/spike.png`,
     prize: `${base}runner/pebble/shell.png`,
     prop: prop ? `${base}runner/pebble/${prop}` : undefined,

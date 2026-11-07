@@ -9,7 +9,7 @@
   var PHI0 = 36 * Math.PI / 180;
   var COS = Math.cos(PHI0);
   var SEA = '#c5e4f3';
-  var CONTEXT = '#d9d6cf';
+  var CONTEXT = '#cfc8ba';
   var STROKE = '#3e3a34';
 
   function project(lon, lat) {
@@ -164,22 +164,28 @@
   }
 
   function ensureStyle() {
-    if (typeof document === 'undefined' || document.getElementById('meca-map-style')) return;
-    var style = document.createElement('style');
-    style.id = 'meca-map-style';
+    if (typeof document === 'undefined') return;
+    var style = document.getElementById('meca-map-style');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'meca-map-style';
+      document.head.appendChild(style);
+    }
     style.textContent = [
-      '.meca-map{position:relative;width:100%;background:#c5e4f3;border-radius:16px;overflow:hidden;touch-action:none}',
+      '.meca-map{position:relative;width:100%;background:#b7d4e4;border-radius:16px;overflow:hidden;touch-action:none}',
       '.meca-map svg{display:block;width:100%;height:auto;max-height:72vh}',
-      '.meca-country{cursor:pointer}',
-      '.meca-country.quiz:hover,.meca-country.quiz:focus{filter:brightness(1.08)}',
+      '.meca-country{cursor:pointer;filter:drop-shadow(0 1px 0 rgba(48,36,22,0.28)) saturate(0.78)}',
+      '.meca-country.context{filter:drop-shadow(0 1px 0 rgba(48,36,22,0.18)) saturate(0.35) brightness(1.04)}',
+      '.meca-asking .meca-country.quiz:not(.meca-selected){filter:drop-shadow(0 1px 0 rgba(48,36,22,0.22)) saturate(0.5) brightness(0.94)}',
+      '.meca-country.quiz:hover,.meca-country.quiz:focus{filter:drop-shadow(0 1px 0 rgba(48,36,22,0.28)) saturate(0.9) brightness(1.04)}',
       '.meca-label,.meca-sea,.meca-part,.meca-leader{pointer-events:none;user-select:none}',
       '.meca-sea{font-style:italic;font-weight:600;fill:#1d4e6e}',
       '.meca-part{font-size:10px;fill:#3e3a34}',
       '.meca-leader{stroke:#3e3a34;stroke-width:0.7}',
       '.meca-hit{stroke:#1c1915;stroke-width:2.5}',
-      '.meca-selected{stroke:#5b3df5;stroke-width:3}'
+      '.meca-selected{stroke:#fff4cc;stroke-width:2.6;animation:atlas-pulse 1.25s ease-in-out infinite}',
+      '@keyframes atlas-pulse{0%,100%{filter:drop-shadow(0 0 2px rgba(255,214,110,0.75)) saturate(1.05) brightness(1.06)}50%{filter:drop-shadow(0 0 8px rgba(255,196,70,0.95)) saturate(1.2) brightness(1.16)}}'
     ].join('');
-    document.head.appendChild(style);
   }
 
   function render(container, fc, options) {
@@ -202,10 +208,43 @@
     svg.setAttribute('role', 'img');
     svg.setAttribute('aria-label', 'Map of the Middle East and Central Asia');
 
+    var defs = document.createElementNS(svg.namespaceURI, 'defs');
+    if (options.sea) {
+      var pat = document.createElementNS(svg.namespaceURI, 'pattern');
+      pat.setAttribute('id', 'meca-sea-water');
+      pat.setAttribute('patternUnits', 'userSpaceOnUse');
+      pat.setAttribute('width', '320');
+      pat.setAttribute('height', '320');
+      var water = document.createElementNS(svg.namespaceURI, 'image');
+      water.setAttribute('href', options.sea);
+      water.setAttribute('width', '320');
+      water.setAttribute('height', '320');
+      water.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+      pat.appendChild(water);
+      defs.appendChild(pat);
+    }
+    var shade = document.createElementNS(svg.namespaceURI, 'radialGradient');
+    shade.setAttribute('id', 'meca-atlas-shade');
+    shade.setAttribute('cx', '50%');
+    shade.setAttribute('cy', '42%');
+    shade.setAttribute('r', '68%');
+    var inner = document.createElementNS(svg.namespaceURI, 'stop');
+    inner.setAttribute('offset', '0%');
+    inner.setAttribute('stop-color', '#fff8ea');
+    inner.setAttribute('stop-opacity', '0.18');
+    var outer = document.createElementNS(svg.namespaceURI, 'stop');
+    outer.setAttribute('offset', '100%');
+    outer.setAttribute('stop-color', '#1d3344');
+    outer.setAttribute('stop-opacity', '0.16');
+    shade.appendChild(inner);
+    shade.appendChild(outer);
+    defs.appendChild(shade);
+    svg.appendChild(defs);
+
     var sea = document.createElementNS(svg.namespaceURI, 'rect');
     sea.setAttribute('width', String(width));
     sea.setAttribute('height', String(height));
-    sea.setAttribute('fill', (fc.meta && fc.meta.colors && fc.meta.colors.sea) || SEA);
+    sea.setAttribute('fill', options.sea ? 'url(#meca-sea-water)' : ((fc.meta && fc.meta.colors && fc.meta.colors.sea) || SEA));
     svg.appendChild(sea);
 
     var ordered = features.slice().sort(function (a, b) {
@@ -227,6 +266,13 @@
       if (props.name) path.setAttribute('data-name', props.name);
       svg.appendChild(path);
     });
+
+    var veil = document.createElementNS(svg.namespaceURI, 'rect');
+    veil.setAttribute('width', String(width));
+    veil.setAttribute('height', String(height));
+    veil.setAttribute('fill', 'url(#meca-atlas-shade)');
+    veil.setAttribute('pointer-events', 'none');
+    svg.appendChild(veil);
 
     if (options.labels !== false) {
       ordered.forEach(function (f) {
