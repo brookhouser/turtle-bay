@@ -1,0 +1,1752 @@
+{
+  "quizDate": "2026-11-13",
+  "title": "Middle East and Central Asia",
+  "note": "Question bank for the 22-country map quiz. There is no game page in this folder.",
+  "spelling": {
+    "normalize": "Lowercase, strip accents and apostrophes, turn & into and, drop a leading the.",
+    "maxEditDistance": {
+      "upTo6Letters": 1,
+      "longer": 2
+    },
+    "rule": "Accept the edit only when this country is strictly closer than every other quiz country."
+  },
+  "items": [
+    {
+      "id": "click-yemen",
+      "mode": "click",
+      "prompt": "Tap Yemen.",
+      "answerId": "yemen",
+      "answer": "Yemen",
+      "suggestedView": "peninsula",
+      "small": false
+    },
+    {
+      "id": "choice-yemen",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "yemen",
+      "answerId": "yemen",
+      "answer": "Yemen",
+      "choices": [
+        {
+          "id": "kuwait",
+          "name": "Kuwait",
+          "correct": false
+        },
+        {
+          "id": "yemen",
+          "name": "Yemen",
+          "correct": true
+        },
+        {
+          "id": "turkmenistan",
+          "name": "Turkmenistan",
+          "correct": false
+        },
+        {
+          "id": "iran",
+          "name": "Iran",
+          "correct": false
+        }
+      ],
+      "suggestedView": "peninsula"
+    },
+    {
+      "id": "typed-yemen",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "yemen",
+      "answerId": "yemen",
+      "answer": "Yemen",
+      "accept": [
+        "Yemen"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "peninsula",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-yemen",
+      "mode": "learn",
+      "prompt": "Yemen",
+      "answerId": "yemen",
+      "region": "arabian-peninsula",
+      "regionName": "Arabian Peninsula",
+      "hook": "Southwest corner of the Arabian Peninsula. Saudi Arabia is north and Oman is east. The Red Sea is west and the Gulf of Aden is south. The island of Socotra, out in the Arabian Sea, is part of Yemen.",
+      "borders": [
+        "saudi-arabia",
+        "oman"
+      ],
+      "seas": [
+        "Red Sea",
+        "Gulf of Aden",
+        "Arabian Sea"
+      ],
+      "partsNote": null,
+      "partNotes": {
+        "socotra": "Socotra is the Yemeni island in the Arabian Sea, east of the Horn of Africa."
+      },
+      "suggestedView": "peninsula"
+    },
+    {
+      "id": "click-oman",
+      "mode": "click",
+      "prompt": "Tap Oman.",
+      "answerId": "oman",
+      "answer": "Oman",
+      "suggestedView": "peninsula",
+      "small": false
+    },
+    {
+      "id": "choice-oman",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "oman",
+      "answerId": "oman",
+      "answer": "Oman",
+      "choices": [
+        {
+          "id": "georgia",
+          "name": "Georgia",
+          "correct": false
+        },
+        {
+          "id": "iran",
+          "name": "Iran",
+          "correct": false
+        },
+        {
+          "id": "syria",
+          "name": "Syria",
+          "correct": false
+        },
+        {
+          "id": "oman",
+          "name": "Oman",
+          "correct": true
+        }
+      ],
+      "suggestedView": "peninsula"
+    },
+    {
+      "id": "typed-oman",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "oman",
+      "answerId": "oman",
+      "answer": "Oman",
+      "accept": [
+        "Oman"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "peninsula",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-oman",
+      "mode": "learn",
+      "prompt": "Oman",
+      "answerId": "oman",
+      "region": "arabian-peninsula",
+      "regionName": "Arabian Peninsula",
+      "hook": "Southeast corner of Arabia, on the Arabian Sea and the Gulf of Oman. A separate piece called Musandam sits up by the Strait of Hormuz. Yemen, Saudi Arabia, and the United Arab Emirates are the land neighbors.",
+      "borders": [
+        "saudi-arabia",
+        "united-arab-emirates",
+        "yemen"
+      ],
+      "seas": [
+        "Arabian Sea",
+        "Gulf of Oman"
+      ],
+      "partsNote": null,
+      "partNotes": {
+        "musandam": "Musandam is the Omani piece on the Strait of Hormuz. It does not touch the rest of Oman.",
+        "masirah": "Masirah is the Omani island off the east coast."
+      },
+      "suggestedView": "peninsula"
+    },
+    {
+      "id": "click-saudi-arabia",
+      "mode": "click",
+      "prompt": "Tap Saudi Arabia.",
+      "answerId": "saudi-arabia",
+      "answer": "Saudi Arabia",
+      "suggestedView": "peninsula",
+      "small": false
+    },
+    {
+      "id": "choice-saudi-arabia",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "saudi-arabia",
+      "answerId": "saudi-arabia",
+      "answer": "Saudi Arabia",
+      "choices": [
+        {
+          "id": "azerbaijan",
+          "name": "Azerbaijan",
+          "correct": false
+        },
+        {
+          "id": "kazakhstan",
+          "name": "Kazakhstan",
+          "correct": false
+        },
+        {
+          "id": "saudi-arabia",
+          "name": "Saudi Arabia",
+          "correct": true
+        },
+        {
+          "id": "iran",
+          "name": "Iran",
+          "correct": false
+        }
+      ],
+      "suggestedView": "peninsula"
+    },
+    {
+      "id": "typed-saudi-arabia",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "saudi-arabia",
+      "answerId": "saudi-arabia",
+      "answer": "Saudi Arabia",
+      "accept": [
+        "Saudi Arabia",
+        "saudi",
+        "ksa"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "peninsula",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-saudi-arabia",
+      "mode": "learn",
+      "prompt": "Saudi Arabia",
+      "answerId": "saudi-arabia",
+      "region": "arabian-peninsula",
+      "regionName": "Arabian Peninsula",
+      "hook": "The big country in the middle of the Arabian Peninsula. It touches Jordan, Iraq, Kuwait, Qatar, the United Arab Emirates, Oman, and Yemen.",
+      "borders": [
+        "iraq",
+        "jordan",
+        "kuwait",
+        "oman",
+        "qatar",
+        "united-arab-emirates",
+        "yemen"
+      ],
+      "seas": [
+        "Red Sea",
+        "Persian Gulf"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "peninsula"
+    },
+    {
+      "id": "click-qatar",
+      "mode": "click",
+      "prompt": "Tap Qatar.",
+      "answerId": "qatar",
+      "answer": "Qatar",
+      "suggestedView": "gulf",
+      "small": true
+    },
+    {
+      "id": "choice-qatar",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "qatar",
+      "answerId": "qatar",
+      "answer": "Qatar",
+      "choices": [
+        {
+          "id": "oman",
+          "name": "Oman",
+          "correct": false
+        },
+        {
+          "id": "armenia",
+          "name": "Armenia",
+          "correct": false
+        },
+        {
+          "id": "yemen",
+          "name": "Yemen",
+          "correct": false
+        },
+        {
+          "id": "qatar",
+          "name": "Qatar",
+          "correct": true
+        }
+      ],
+      "suggestedView": "gulf"
+    },
+    {
+      "id": "typed-qatar",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "qatar",
+      "answerId": "qatar",
+      "answer": "Qatar",
+      "accept": [
+        "Qatar"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "gulf",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-qatar",
+      "mode": "learn",
+      "prompt": "Qatar",
+      "answerId": "qatar",
+      "region": "arabian-peninsula",
+      "regionName": "Arabian Peninsula",
+      "hook": "A small thumb of land sticking into the Persian Gulf. Saudi Arabia is the only land neighbor. Zoom in so it is easy to tap. Bahrain is the island nearby, and Bahrain is not on this quiz.",
+      "borders": [
+        "saudi-arabia"
+      ],
+      "seas": [
+        "Persian Gulf"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "gulf"
+    },
+    {
+      "id": "click-united-arab-emirates",
+      "mode": "click",
+      "prompt": "Tap United Arab Emirates.",
+      "answerId": "united-arab-emirates",
+      "answer": "United Arab Emirates",
+      "suggestedView": "gulf",
+      "small": true
+    },
+    {
+      "id": "choice-united-arab-emirates",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "united-arab-emirates",
+      "answerId": "united-arab-emirates",
+      "answer": "United Arab Emirates",
+      "choices": [
+        {
+          "id": "tajikistan",
+          "name": "Tajikistan",
+          "correct": false
+        },
+        {
+          "id": "israel",
+          "name": "Israel",
+          "correct": false
+        },
+        {
+          "id": "kyrgyzstan",
+          "name": "Kyrgyzstan",
+          "correct": false
+        },
+        {
+          "id": "united-arab-emirates",
+          "name": "United Arab Emirates",
+          "correct": true
+        }
+      ],
+      "suggestedView": "gulf"
+    },
+    {
+      "id": "typed-united-arab-emirates",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "united-arab-emirates",
+      "answerId": "united-arab-emirates",
+      "answer": "United Arab Emirates",
+      "accept": [
+        "United Arab Emirates",
+        "uae",
+        "u.a.e.",
+        "emirates",
+        "the emirates",
+        "UAE"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "gulf",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-united-arab-emirates",
+      "mode": "learn",
+      "prompt": "United Arab Emirates",
+      "answerId": "united-arab-emirates",
+      "region": "arabian-peninsula",
+      "regionName": "Arabian Peninsula",
+      "hook": "On the Persian Gulf, east of Saudi Arabia and north of Oman. The long name is the United Arab Emirates. UAE is the short name. Qatar is nearby but does not share a land border.",
+      "borders": [
+        "oman",
+        "saudi-arabia"
+      ],
+      "seas": [
+        "Persian Gulf",
+        "Gulf of Oman"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "gulf"
+    },
+    {
+      "id": "click-kuwait",
+      "mode": "click",
+      "prompt": "Tap Kuwait.",
+      "answerId": "kuwait",
+      "answer": "Kuwait",
+      "suggestedView": "gulf",
+      "small": true
+    },
+    {
+      "id": "choice-kuwait",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "kuwait",
+      "answerId": "kuwait",
+      "answer": "Kuwait",
+      "choices": [
+        {
+          "id": "iraq",
+          "name": "Iraq",
+          "correct": false
+        },
+        {
+          "id": "kuwait",
+          "name": "Kuwait",
+          "correct": true
+        },
+        {
+          "id": "saudi-arabia",
+          "name": "Saudi Arabia",
+          "correct": false
+        },
+        {
+          "id": "oman",
+          "name": "Oman",
+          "correct": false
+        }
+      ],
+      "suggestedView": "gulf"
+    },
+    {
+      "id": "typed-kuwait",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "kuwait",
+      "answerId": "kuwait",
+      "answer": "Kuwait",
+      "accept": [
+        "Kuwait"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "gulf",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-kuwait",
+      "mode": "learn",
+      "prompt": "Kuwait",
+      "answerId": "kuwait",
+      "region": "arabian-peninsula",
+      "regionName": "Arabian Peninsula",
+      "hook": "Small country at the top of the Persian Gulf, tucked between Iraq and Saudi Arabia. Zoom in.",
+      "borders": [
+        "iraq",
+        "saudi-arabia"
+      ],
+      "seas": [
+        "Persian Gulf"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "gulf"
+    },
+    {
+      "id": "click-jordan",
+      "mode": "click",
+      "prompt": "Tap Jordan.",
+      "answerId": "jordan",
+      "answer": "Jordan",
+      "suggestedView": "levant",
+      "small": false
+    },
+    {
+      "id": "choice-jordan",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "jordan",
+      "answerId": "jordan",
+      "answer": "Jordan",
+      "choices": [
+        {
+          "id": "palestine",
+          "name": "Palestine",
+          "correct": false
+        },
+        {
+          "id": "iraq",
+          "name": "Iraq",
+          "correct": false
+        },
+        {
+          "id": "lebanon",
+          "name": "Lebanon",
+          "correct": false
+        },
+        {
+          "id": "jordan",
+          "name": "Jordan",
+          "correct": true
+        }
+      ],
+      "suggestedView": "levant"
+    },
+    {
+      "id": "typed-jordan",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "jordan",
+      "answerId": "jordan",
+      "answer": "Jordan",
+      "accept": [
+        "Jordan"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "levant",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-jordan",
+      "mode": "learn",
+      "prompt": "Jordan",
+      "answerId": "jordan",
+      "region": "levant",
+      "regionName": "Levant",
+      "hook": "East of Israel and the West Bank. Syria is north, Iraq is east, and Saudi Arabia is south. Jordan has a short coast on the Gulf of Aqaba, not on the Mediterranean.",
+      "borders": [
+        "iraq",
+        "israel",
+        "palestine",
+        "saudi-arabia",
+        "syria"
+      ],
+      "seas": [],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "levant"
+    },
+    {
+      "id": "click-israel",
+      "mode": "click",
+      "prompt": "Tap Israel.",
+      "answerId": "israel",
+      "answer": "Israel",
+      "suggestedView": "levant",
+      "small": true
+    },
+    {
+      "id": "choice-israel",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "israel",
+      "answerId": "israel",
+      "answer": "Israel",
+      "choices": [
+        {
+          "id": "kazakhstan",
+          "name": "Kazakhstan",
+          "correct": false
+        },
+        {
+          "id": "israel",
+          "name": "Israel",
+          "correct": true
+        },
+        {
+          "id": "georgia",
+          "name": "Georgia",
+          "correct": false
+        },
+        {
+          "id": "qatar",
+          "name": "Qatar",
+          "correct": false
+        }
+      ],
+      "suggestedView": "levant"
+    },
+    {
+      "id": "typed-israel",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "israel",
+      "answerId": "israel",
+      "answer": "Israel",
+      "accept": [
+        "Israel"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "levant",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-israel",
+      "mode": "learn",
+      "prompt": "Israel",
+      "answerId": "israel",
+      "region": "levant",
+      "regionName": "Levant",
+      "hook": "On the Mediterranean Sea, south of Lebanon and west of Jordan. Palestine on this quiz is the West Bank beside it and the Gaza Strip on the coast. Egypt is to the southwest.",
+      "borders": [
+        "egypt",
+        "jordan",
+        "lebanon",
+        "palestine",
+        "syria"
+      ],
+      "seas": [
+        "Mediterranean Sea"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "levant"
+    },
+    {
+      "id": "click-palestine",
+      "mode": "click",
+      "prompt": "Tap Palestine (West Bank and Gaza).",
+      "answerId": "palestine",
+      "answer": "Palestine",
+      "suggestedView": "levant",
+      "small": true
+    },
+    {
+      "id": "choice-palestine",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "palestine",
+      "answerId": "palestine",
+      "answer": "Palestine",
+      "choices": [
+        {
+          "id": "palestine",
+          "name": "Palestine",
+          "correct": true
+        },
+        {
+          "id": "iraq",
+          "name": "Iraq",
+          "correct": false
+        },
+        {
+          "id": "kuwait",
+          "name": "Kuwait",
+          "correct": false
+        },
+        {
+          "id": "armenia",
+          "name": "Armenia",
+          "correct": false
+        }
+      ],
+      "suggestedView": "levant"
+    },
+    {
+      "id": "typed-palestine",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "palestine",
+      "answerId": "palestine",
+      "answer": "Palestine",
+      "accept": [
+        "Palestine",
+        "west bank and gaza",
+        "west bank & gaza",
+        "the west bank and gaza",
+        "west bank and the gaza strip"
+      ],
+      "rejectAlone": [
+        "gaza",
+        "gaza strip",
+        "west bank",
+        "the west bank"
+      ],
+      "suggestedView": "levant",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-palestine",
+      "mode": "learn",
+      "prompt": "Palestine",
+      "answerId": "palestine",
+      "region": "levant",
+      "regionName": "Levant",
+      "hook": "On this quiz, Palestine means two places: the West Bank and the Gaza Strip. The West Bank is inland, between Israel and Jordan. Gaza is the small strip on the Mediterranean, beside Israel and Egypt. Both parts are the same answer.",
+      "borders": [
+        "egypt",
+        "israel",
+        "jordan"
+      ],
+      "seas": [
+        "Mediterranean Sea"
+      ],
+      "partsNote": "Drawn as the West Bank and the Gaza Strip, both labeled Palestine. Natural Earth admin-0 lines. This is the quiz label, not a statement about sovereignty.",
+      "partNotes": {
+        "west-bank": "The West Bank is the inland part of Palestine on this map, between Israel and Jordan.",
+        "gaza": "Gaza is the small Mediterranean part of Palestine on this map. It touches Israel and Egypt."
+      },
+      "suggestedView": "levant"
+    },
+    {
+      "id": "click-lebanon",
+      "mode": "click",
+      "prompt": "Tap Lebanon.",
+      "answerId": "lebanon",
+      "answer": "Lebanon",
+      "suggestedView": "levant",
+      "small": true
+    },
+    {
+      "id": "choice-lebanon",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "lebanon",
+      "answerId": "lebanon",
+      "answer": "Lebanon",
+      "choices": [
+        {
+          "id": "turkmenistan",
+          "name": "Turkmenistan",
+          "correct": false
+        },
+        {
+          "id": "israel",
+          "name": "Israel",
+          "correct": false
+        },
+        {
+          "id": "kuwait",
+          "name": "Kuwait",
+          "correct": false
+        },
+        {
+          "id": "lebanon",
+          "name": "Lebanon",
+          "correct": true
+        }
+      ],
+      "suggestedView": "levant"
+    },
+    {
+      "id": "typed-lebanon",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "lebanon",
+      "answerId": "lebanon",
+      "answer": "Lebanon",
+      "accept": [
+        "Lebanon"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "levant",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-lebanon",
+      "mode": "learn",
+      "prompt": "Lebanon",
+      "answerId": "lebanon",
+      "region": "levant",
+      "regionName": "Levant",
+      "hook": "A small country on the Mediterranean, north of Israel and west of Syria. It is a thin strip, so zoom in.",
+      "borders": [
+        "israel",
+        "syria"
+      ],
+      "seas": [
+        "Mediterranean Sea"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "levant"
+    },
+    {
+      "id": "click-syria",
+      "mode": "click",
+      "prompt": "Tap Syria.",
+      "answerId": "syria",
+      "answer": "Syria",
+      "suggestedView": "levant",
+      "small": false
+    },
+    {
+      "id": "choice-syria",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "syria",
+      "answerId": "syria",
+      "answer": "Syria",
+      "choices": [
+        {
+          "id": "qatar",
+          "name": "Qatar",
+          "correct": false
+        },
+        {
+          "id": "syria",
+          "name": "Syria",
+          "correct": true
+        },
+        {
+          "id": "turkey",
+          "name": "Turkey",
+          "correct": false
+        },
+        {
+          "id": "armenia",
+          "name": "Armenia",
+          "correct": false
+        }
+      ],
+      "suggestedView": "levant"
+    },
+    {
+      "id": "typed-syria",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "syria",
+      "answerId": "syria",
+      "answer": "Syria",
+      "accept": [
+        "Syria"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "levant",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-syria",
+      "mode": "learn",
+      "prompt": "Syria",
+      "answerId": "syria",
+      "region": "levant",
+      "regionName": "Levant",
+      "hook": "North of Jordan, Lebanon, and Israel, south of Turkey, and west of Iraq. Syria has a short coast on the Mediterranean.",
+      "borders": [
+        "iraq",
+        "israel",
+        "jordan",
+        "lebanon",
+        "turkey"
+      ],
+      "seas": [
+        "Mediterranean Sea"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "levant"
+    },
+    {
+      "id": "click-iraq",
+      "mode": "click",
+      "prompt": "Tap Iraq.",
+      "answerId": "iraq",
+      "answer": "Iraq",
+      "suggestedView": "full",
+      "small": false
+    },
+    {
+      "id": "choice-iraq",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "iraq",
+      "answerId": "iraq",
+      "answer": "Iraq",
+      "choices": [
+        {
+          "id": "iraq",
+          "name": "Iraq",
+          "correct": true
+        },
+        {
+          "id": "oman",
+          "name": "Oman",
+          "correct": false
+        },
+        {
+          "id": "yemen",
+          "name": "Yemen",
+          "correct": false
+        },
+        {
+          "id": "qatar",
+          "name": "Qatar",
+          "correct": false
+        }
+      ],
+      "suggestedView": "full"
+    },
+    {
+      "id": "typed-iraq",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "iraq",
+      "answerId": "iraq",
+      "answer": "Iraq",
+      "accept": [
+        "Iraq"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "full",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-iraq",
+      "mode": "learn",
+      "prompt": "Iraq",
+      "answerId": "iraq",
+      "region": "crossroads",
+      "regionName": "Turkey, Iraq, and Iran",
+      "hook": "Between Syria and Iran, south of Turkey, and north of Saudi Arabia and Kuwait. Memory hook: Mesopotamia means the land between the Tigris and Euphrates rivers. Iraq is west of Iran.",
+      "borders": [
+        "iran",
+        "jordan",
+        "kuwait",
+        "saudi-arabia",
+        "syria",
+        "turkey"
+      ],
+      "seas": [
+        "Persian Gulf"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "full"
+    },
+    {
+      "id": "click-iran",
+      "mode": "click",
+      "prompt": "Tap Iran.",
+      "answerId": "iran",
+      "answer": "Iran",
+      "suggestedView": "full",
+      "small": false
+    },
+    {
+      "id": "choice-iran",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "iran",
+      "answerId": "iran",
+      "answer": "Iran",
+      "choices": [
+        {
+          "id": "syria",
+          "name": "Syria",
+          "correct": false
+        },
+        {
+          "id": "united-arab-emirates",
+          "name": "United Arab Emirates",
+          "correct": false
+        },
+        {
+          "id": "iran",
+          "name": "Iran",
+          "correct": true
+        },
+        {
+          "id": "jordan",
+          "name": "Jordan",
+          "correct": false
+        }
+      ],
+      "suggestedView": "full"
+    },
+    {
+      "id": "typed-iran",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "iran",
+      "answerId": "iran",
+      "answer": "Iran",
+      "accept": [
+        "Iran"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "full",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-iran",
+      "mode": "learn",
+      "prompt": "Iran",
+      "answerId": "iran",
+      "region": "crossroads",
+      "regionName": "Turkey, Iraq, and Iran",
+      "hook": "The large country east of Iraq. The Caspian Sea is on the north. The Persian Gulf and the Gulf of Oman are on the south. Iran also touches Turkey, Armenia, Azerbaijan, and Turkmenistan. Afghanistan and Pakistan are to the east, and they are not on this quiz.",
+      "borders": [
+        "afghanistan",
+        "armenia",
+        "azerbaijan",
+        "iraq",
+        "pakistan",
+        "turkey",
+        "turkmenistan"
+      ],
+      "seas": [
+        "Caspian Sea",
+        "Persian Gulf",
+        "Gulf of Oman"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "full"
+    },
+    {
+      "id": "click-azerbaijan",
+      "mode": "click",
+      "prompt": "Tap Azerbaijan.",
+      "answerId": "azerbaijan",
+      "answer": "Azerbaijan",
+      "suggestedView": "caucasus",
+      "small": false
+    },
+    {
+      "id": "choice-azerbaijan",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "azerbaijan",
+      "answerId": "azerbaijan",
+      "answer": "Azerbaijan",
+      "choices": [
+        {
+          "id": "azerbaijan",
+          "name": "Azerbaijan",
+          "correct": true
+        },
+        {
+          "id": "lebanon",
+          "name": "Lebanon",
+          "correct": false
+        },
+        {
+          "id": "israel",
+          "name": "Israel",
+          "correct": false
+        },
+        {
+          "id": "jordan",
+          "name": "Jordan",
+          "correct": false
+        }
+      ],
+      "suggestedView": "caucasus"
+    },
+    {
+      "id": "typed-azerbaijan",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "azerbaijan",
+      "answerId": "azerbaijan",
+      "answer": "Azerbaijan",
+      "accept": [
+        "Azerbaijan",
+        "azerbaidzhan",
+        "azerbayjan"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "caucasus",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-azerbaijan",
+      "mode": "learn",
+      "prompt": "Azerbaijan",
+      "answerId": "azerbaijan",
+      "region": "caucasus",
+      "regionName": "Caucasus",
+      "hook": "On the west side of the Caspian Sea, in the Caucasus. Georgia is northwest, Armenia is west, Iran is south, and Russia is north. A separate piece, Nakhchivan, touches Armenia, Turkey, and Iran.",
+      "borders": [
+        "armenia",
+        "georgia",
+        "iran",
+        "russia",
+        "turkey"
+      ],
+      "seas": [
+        "Caspian Sea"
+      ],
+      "partsNote": null,
+      "partNotes": {
+        "nakhchivan": "Nakhchivan is the Azerbaijani piece between Armenia, Turkey, and Iran. It does not touch the rest of Azerbaijan."
+      },
+      "suggestedView": "caucasus"
+    },
+    {
+      "id": "click-armenia",
+      "mode": "click",
+      "prompt": "Tap Armenia.",
+      "answerId": "armenia",
+      "answer": "Armenia",
+      "suggestedView": "caucasus",
+      "small": true
+    },
+    {
+      "id": "choice-armenia",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "armenia",
+      "answerId": "armenia",
+      "answer": "Armenia",
+      "choices": [
+        {
+          "id": "lebanon",
+          "name": "Lebanon",
+          "correct": false
+        },
+        {
+          "id": "qatar",
+          "name": "Qatar",
+          "correct": false
+        },
+        {
+          "id": "armenia",
+          "name": "Armenia",
+          "correct": true
+        },
+        {
+          "id": "iran",
+          "name": "Iran",
+          "correct": false
+        }
+      ],
+      "suggestedView": "caucasus"
+    },
+    {
+      "id": "typed-armenia",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "armenia",
+      "answerId": "armenia",
+      "answer": "Armenia",
+      "accept": [
+        "Armenia"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "caucasus",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-armenia",
+      "mode": "learn",
+      "prompt": "Armenia",
+      "answerId": "armenia",
+      "region": "caucasus",
+      "regionName": "Caucasus",
+      "hook": "Small and landlocked in the Caucasus, south of Georgia. Turkey is west, Iran is south, and Azerbaijan is on the other sides. Zoom in.",
+      "borders": [
+        "azerbaijan",
+        "georgia",
+        "iran",
+        "turkey"
+      ],
+      "seas": [],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "caucasus"
+    },
+    {
+      "id": "click-turkey",
+      "mode": "click",
+      "prompt": "Tap Turkey.",
+      "answerId": "turkey",
+      "answer": "Turkey",
+      "suggestedView": "anatolia",
+      "small": false
+    },
+    {
+      "id": "choice-turkey",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "turkey",
+      "answerId": "turkey",
+      "answer": "Turkey",
+      "choices": [
+        {
+          "id": "turkey",
+          "name": "Turkey",
+          "correct": true
+        },
+        {
+          "id": "armenia",
+          "name": "Armenia",
+          "correct": false
+        },
+        {
+          "id": "lebanon",
+          "name": "Lebanon",
+          "correct": false
+        },
+        {
+          "id": "georgia",
+          "name": "Georgia",
+          "correct": false
+        }
+      ],
+      "suggestedView": "anatolia"
+    },
+    {
+      "id": "typed-turkey",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "turkey",
+      "answerId": "turkey",
+      "answer": "Turkey",
+      "accept": [
+        "Turkey",
+        "turkiye"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "anatolia",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-turkey",
+      "mode": "learn",
+      "prompt": "Turkey",
+      "answerId": "turkey",
+      "region": "crossroads",
+      "regionName": "Turkey, Iraq, and Iran",
+      "hook": "The wide country between the Black Sea and the Mediterranean. It reaches from Greece and Bulgaria east to Georgia, Armenia, Iran, Iraq, and Syria. The piece west of the Bosporus is the European part of Turkey.",
+      "borders": [
+        "armenia",
+        "azerbaijan",
+        "bulgaria",
+        "georgia",
+        "greece",
+        "iran",
+        "iraq",
+        "syria"
+      ],
+      "seas": [
+        "Black Sea",
+        "Mediterranean Sea"
+      ],
+      "partsNote": null,
+      "partNotes": {
+        "european": "The smaller piece west of the Bosporus is the European part of Turkey."
+      },
+      "suggestedView": "anatolia"
+    },
+    {
+      "id": "click-georgia",
+      "mode": "click",
+      "prompt": "Tap Georgia.",
+      "answerId": "georgia",
+      "answer": "Georgia",
+      "suggestedView": "caucasus",
+      "small": false
+    },
+    {
+      "id": "choice-georgia",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "georgia",
+      "answerId": "georgia",
+      "answer": "Georgia",
+      "choices": [
+        {
+          "id": "georgia",
+          "name": "Georgia",
+          "correct": true
+        },
+        {
+          "id": "israel",
+          "name": "Israel",
+          "correct": false
+        },
+        {
+          "id": "tajikistan",
+          "name": "Tajikistan",
+          "correct": false
+        },
+        {
+          "id": "armenia",
+          "name": "Armenia",
+          "correct": false
+        }
+      ],
+      "suggestedView": "caucasus"
+    },
+    {
+      "id": "typed-georgia",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "georgia",
+      "answerId": "georgia",
+      "answer": "Georgia",
+      "accept": [
+        "Georgia"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "caucasus",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-georgia",
+      "mode": "learn",
+      "prompt": "Georgia",
+      "answerId": "georgia",
+      "region": "caucasus",
+      "regionName": "Caucasus",
+      "hook": "In the Caucasus, on the east side of the Black Sea. Russia is north, Turkey is southwest, and Armenia and Azerbaijan are south and southeast. This is the country of Georgia, not the U.S. state.",
+      "borders": [
+        "armenia",
+        "azerbaijan",
+        "russia",
+        "turkey"
+      ],
+      "seas": [
+        "Black Sea"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "caucasus"
+    },
+    {
+      "id": "click-kyrgyzstan",
+      "mode": "click",
+      "prompt": "Tap Kyrgyzstan.",
+      "answerId": "kyrgyzstan",
+      "answer": "Kyrgyzstan",
+      "suggestedView": "stans",
+      "small": false
+    },
+    {
+      "id": "choice-kyrgyzstan",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "kyrgyzstan",
+      "answerId": "kyrgyzstan",
+      "answer": "Kyrgyzstan",
+      "choices": [
+        {
+          "id": "azerbaijan",
+          "name": "Azerbaijan",
+          "correct": false
+        },
+        {
+          "id": "kyrgyzstan",
+          "name": "Kyrgyzstan",
+          "correct": true
+        },
+        {
+          "id": "turkmenistan",
+          "name": "Turkmenistan",
+          "correct": false
+        },
+        {
+          "id": "uzbekistan",
+          "name": "Uzbekistan",
+          "correct": false
+        }
+      ],
+      "suggestedView": "stans"
+    },
+    {
+      "id": "typed-kyrgyzstan",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "kyrgyzstan",
+      "answerId": "kyrgyzstan",
+      "answer": "Kyrgyzstan",
+      "accept": [
+        "Kyrgyzstan",
+        "kirghizstan",
+        "kirgizstan",
+        "kyrgystan",
+        "kyrgyz republic"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "stans",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-kyrgyzstan",
+      "mode": "learn",
+      "prompt": "Kyrgyzstan",
+      "answerId": "kyrgyzstan",
+      "region": "the-stans",
+      "regionName": "The -stans",
+      "hook": "A mountain -stan in the east, touching China. Kazakhstan is north, Uzbekistan is west, and Tajikistan is south. Kyrgyzstan has no seacoast.",
+      "borders": [
+        "china",
+        "kazakhstan",
+        "tajikistan",
+        "uzbekistan"
+      ],
+      "seas": [],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "stans"
+    },
+    {
+      "id": "click-turkmenistan",
+      "mode": "click",
+      "prompt": "Tap Turkmenistan.",
+      "answerId": "turkmenistan",
+      "answer": "Turkmenistan",
+      "suggestedView": "stans",
+      "small": false
+    },
+    {
+      "id": "choice-turkmenistan",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "turkmenistan",
+      "answerId": "turkmenistan",
+      "answer": "Turkmenistan",
+      "choices": [
+        {
+          "id": "lebanon",
+          "name": "Lebanon",
+          "correct": false
+        },
+        {
+          "id": "turkmenistan",
+          "name": "Turkmenistan",
+          "correct": true
+        },
+        {
+          "id": "syria",
+          "name": "Syria",
+          "correct": false
+        },
+        {
+          "id": "armenia",
+          "name": "Armenia",
+          "correct": false
+        }
+      ],
+      "suggestedView": "stans"
+    },
+    {
+      "id": "typed-turkmenistan",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "turkmenistan",
+      "answerId": "turkmenistan",
+      "answer": "Turkmenistan",
+      "accept": [
+        "Turkmenistan",
+        "turkmenia"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "stans",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-turkmenistan",
+      "mode": "learn",
+      "prompt": "Turkmenistan",
+      "answerId": "turkmenistan",
+      "region": "the-stans",
+      "regionName": "The -stans",
+      "hook": "The -stan along the east side of the Caspian Sea, south of Kazakhstan and north of Iran. Afghanistan and Uzbekistan are the other land neighbors.",
+      "borders": [
+        "afghanistan",
+        "iran",
+        "kazakhstan",
+        "uzbekistan"
+      ],
+      "seas": [
+        "Caspian Sea"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "stans"
+    },
+    {
+      "id": "click-tajikistan",
+      "mode": "click",
+      "prompt": "Tap Tajikistan.",
+      "answerId": "tajikistan",
+      "answer": "Tajikistan",
+      "suggestedView": "stans",
+      "small": false
+    },
+    {
+      "id": "choice-tajikistan",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "tajikistan",
+      "answerId": "tajikistan",
+      "answer": "Tajikistan",
+      "choices": [
+        {
+          "id": "tajikistan",
+          "name": "Tajikistan",
+          "correct": true
+        },
+        {
+          "id": "kuwait",
+          "name": "Kuwait",
+          "correct": false
+        },
+        {
+          "id": "uzbekistan",
+          "name": "Uzbekistan",
+          "correct": false
+        },
+        {
+          "id": "lebanon",
+          "name": "Lebanon",
+          "correct": false
+        }
+      ],
+      "suggestedView": "stans"
+    },
+    {
+      "id": "typed-tajikistan",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "tajikistan",
+      "answerId": "tajikistan",
+      "answer": "Tajikistan",
+      "accept": [
+        "Tajikistan",
+        "tadzhikistan",
+        "tadjikistan",
+        "tajikstan"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "stans",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-tajikistan",
+      "mode": "learn",
+      "prompt": "Tajikistan",
+      "answerId": "tajikistan",
+      "region": "the-stans",
+      "regionName": "The -stans",
+      "hook": "A mountain -stan in the southeast. Uzbekistan is west, Kyrgyzstan is north, China is east, and Afghanistan is south. Tajikistan does not touch Kazakhstan or the sea.",
+      "borders": [
+        "afghanistan",
+        "china",
+        "kyrgyzstan",
+        "uzbekistan"
+      ],
+      "seas": [],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "stans"
+    },
+    {
+      "id": "click-uzbekistan",
+      "mode": "click",
+      "prompt": "Tap Uzbekistan.",
+      "answerId": "uzbekistan",
+      "answer": "Uzbekistan",
+      "suggestedView": "stans",
+      "small": false
+    },
+    {
+      "id": "choice-uzbekistan",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "uzbekistan",
+      "answerId": "uzbekistan",
+      "answer": "Uzbekistan",
+      "choices": [
+        {
+          "id": "iran",
+          "name": "Iran",
+          "correct": false
+        },
+        {
+          "id": "uzbekistan",
+          "name": "Uzbekistan",
+          "correct": true
+        },
+        {
+          "id": "kuwait",
+          "name": "Kuwait",
+          "correct": false
+        },
+        {
+          "id": "azerbaijan",
+          "name": "Azerbaijan",
+          "correct": false
+        }
+      ],
+      "suggestedView": "stans"
+    },
+    {
+      "id": "typed-uzbekistan",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "uzbekistan",
+      "answerId": "uzbekistan",
+      "answer": "Uzbekistan",
+      "accept": [
+        "Uzbekistan"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "stans",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-uzbekistan",
+      "mode": "learn",
+      "prompt": "Uzbekistan",
+      "answerId": "uzbekistan",
+      "region": "the-stans",
+      "regionName": "The -stans",
+      "hook": "The middle -stan. It touches all four of the other -stans on this quiz, plus Afghanistan. It has no seacoast, and it does not touch China.",
+      "borders": [
+        "afghanistan",
+        "kazakhstan",
+        "kyrgyzstan",
+        "tajikistan",
+        "turkmenistan"
+      ],
+      "seas": [],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "stans"
+    },
+    {
+      "id": "click-kazakhstan",
+      "mode": "click",
+      "prompt": "Tap Kazakhstan.",
+      "answerId": "kazakhstan",
+      "answer": "Kazakhstan",
+      "suggestedView": "stans",
+      "small": false
+    },
+    {
+      "id": "choice-kazakhstan",
+      "mode": "name-choice",
+      "prompt": "What country is highlighted?",
+      "highlight": "kazakhstan",
+      "answerId": "kazakhstan",
+      "answer": "Kazakhstan",
+      "choices": [
+        {
+          "id": "turkmenistan",
+          "name": "Turkmenistan",
+          "correct": false
+        },
+        {
+          "id": "lebanon",
+          "name": "Lebanon",
+          "correct": false
+        },
+        {
+          "id": "azerbaijan",
+          "name": "Azerbaijan",
+          "correct": false
+        },
+        {
+          "id": "kazakhstan",
+          "name": "Kazakhstan",
+          "correct": true
+        }
+      ],
+      "suggestedView": "stans"
+    },
+    {
+      "id": "typed-kazakhstan",
+      "mode": "name-typed",
+      "prompt": "Type the name of the highlighted country.",
+      "highlight": "kazakhstan",
+      "answerId": "kazakhstan",
+      "answer": "Kazakhstan",
+      "accept": [
+        "Kazakhstan",
+        "kazakstan"
+      ],
+      "rejectAlone": [],
+      "suggestedView": "stans",
+      "spelling": "Use gradeTyped in questions.js. Short names allow 1 edit. Longer names allow 2. The closest quiz name has to be this country, so Iran and Iraq never match each other."
+    },
+    {
+      "id": "learn-kazakhstan",
+      "mode": "learn",
+      "prompt": "Kazakhstan",
+      "answerId": "kazakhstan",
+      "region": "the-stans",
+      "regionName": "The -stans",
+      "hook": "The giant -stan across the north. It touches the Caspian Sea and stretches east to China. Russia is the long northern neighbor. Kyrgyzstan, Uzbekistan, and Turkmenistan are south. Kazakhstan does not touch Tajikistan.",
+      "borders": [
+        "china",
+        "kyrgyzstan",
+        "russia",
+        "turkmenistan",
+        "uzbekistan"
+      ],
+      "seas": [
+        "Caspian Sea"
+      ],
+      "partsNote": null,
+      "partNotes": null,
+      "suggestedView": "stans"
+    }
+  ],
+  "sets": {
+    "timedBlankMap": {
+      "id": "timed-blank-map",
+      "mode": "timed-test",
+      "prompt": "Blank map of all 22 countries. No word bank. A practice timer, not the official class period.",
+      "minutes": 10,
+      "countryIds": [
+        "yemen",
+        "oman",
+        "saudi-arabia",
+        "qatar",
+        "united-arab-emirates",
+        "kuwait",
+        "jordan",
+        "israel",
+        "palestine",
+        "lebanon",
+        "syria",
+        "iraq",
+        "iran",
+        "azerbaijan",
+        "armenia",
+        "turkey",
+        "georgia",
+        "kyrgyzstan",
+        "turkmenistan",
+        "tajikistan",
+        "uzbekistan",
+        "kazakhstan"
+      ],
+      "grading": "Same spelling tolerance as name-typed."
+    },
+    "missedReview": {
+      "id": "missed-review",
+      "mode": "missed-review",
+      "prompt": "Practice only the countries that were missed.",
+      "sourceModes": [
+        "click",
+        "name-choice",
+        "name-typed",
+        "timed-test"
+      ]
+    }
+  }
+}

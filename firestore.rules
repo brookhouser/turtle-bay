@@ -1,35 +1,239 @@
 rules_version = '2';
-// Parents: brookhouser@gmail.com (Kevin) and bbrookhouser@gmail.com (Beth).
-// A parent must sign in with Google, and Google must report the email as verified.
-// Email/Password is on for kid bays, so a password account that merely claims a
-// parent address is never treated as a parent.
-// Emails are compared in lowercase. A kid may only touch the document whose id is their Auth uid.
+// Founding family (Turtle Bay / Brookhouser). Keep these emails in sync with src/family/roster.ts.
+// Parents: brookhouser@gmail.com (Kevin), bbrookhouser@gmail.com (Beth).
+// Kids: sambrookhouser@gmail.com (Sam), wilsonbrookhouser@gmail.com (Wally).
+// Other families exist only as directory documents created by an invite.
+// A placeholder address is never listed here, so it cannot sign in.
+// Google sign-in only. Email/password bay logins are retired.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {
       return request.auth != null;
     }
 
-    function isParent() {
+    function googleUser() {
       return signedIn()
         && request.auth.token.firebase.sign_in_provider == 'google.com'
         && request.auth.token.email_verified == true
-        && request.auth.token.email is string
-        && request.auth.token.email.lower() in [
-          'brookhouser@gmail.com',
-          'bbrookhouser@gmail.com'
-        ];
+        && request.auth.token.email is string;
     }
 
-    function isOwnKid(kidId) {
-      return signedIn() && request.auth.uid == kidId;
+    function email() {
+      return request.auth.token.email.lower();
     }
 
-    match /families/{familyId}/kids/{kidId} {
-      allow get: if isOwnKid(kidId) || isParent();
-      allow list: if isParent();
-      allow create, update: if isOwnKid(kidId) || isParent();
-      allow delete: if isParent();
+    function emailKey() {
+      return email().replace('@', '_at_').replace('.', '_');
+    }
+
+    function isFoundingParent() {
+      return googleUser() && email() in [
+        'brookhouser@gmail.com',
+        'bbrookhouser@gmail.com'
+      ];
+    }
+
+    function isFoundingKid(kidId) {
+      return googleUser() && (
+        (kidId == 'sam' && email() == 'sambrookhouser@gmail.com')
+        || (kidId == 'wally' && email() == 'wilsonbrookhouser@gmail.com')
+      );
+    }
+
+    // Keep in sync with WALLY_SCHOOL_EMAIL in src/family/roster.ts.
+    // Empty matches nobody. Fill in Wally's @santacatalina.org Workspace address later.
+    function wallySchoolEmail() {
+      return '';
+    }
+
+    function isSchoolWally() {
+      return googleUser()
+        && wallySchoolEmail().size() > 0
+        && email() == wallySchoolEmail();
+    }
+
+    function isSchoolProfile(familyId, kidId) {
+      return familyId == 'turtlebay' && kidId == 'wally' && isSchoolWally();
+    }
+
+    function noFamilySecrets() {
+      return !request.resource.data.keys().hasAny(['tasks', 'routines', 'completions']);
+    }
+
+    function directory() {
+      return get(/databases/$(database)/documents/directory/$(emailKey())).data;
+    }
+
+    function hasDirectory() {
+      return googleUser() && exists(/databases/$(database)/documents/directory/$(emailKey()));
+    }
+
+    function directoryFamily() {
+      return directory().familyId;
+    }
+
+    function isParentOf(familyId) {
+      return !isSchoolWally() && (
+        (familyId == 'turtlebay' && isFoundingParent())
+        || (familyId != 'turtlebay'
+          && hasDirectory()
+          && directory().role == 'parent'
+          && directory().email == email()
+          && directoryFamily() == familyId)
+      );
+    }
+
+    function isKidSelf(familyId, kidId) {
+      return !isSchoolWally() && (
+        (familyId == 'turtlebay' && isFoundingKid(kidId))
+        || (familyId != 'turtlebay'
+          && hasDirectory()
+          && directory().role == 'kid'
+          && directory().email == email()
+          && directoryFamily() == familyId
+          && directory().kidId == kidId)
+      );
+    }
+
+    function isKidIn(familyId) {
+      return !isSchoolWally() && (
+        (familyId == 'turtlebay' && googleUser() && email() in [
+          'sambrookhouser@gmail.com',
+          'wilsonbrookhouser@gmail.com'
+        ])
+        || (familyId != 'turtlebay' && hasDirectory() && directory().role == 'kid' && directoryFamily() == familyId)
+      );
+    }
+
+    function inGroupAsKid(groupId) {
+      return (isFoundingKid('wally') && exists(/databases/$(database)/documents/groups/$(groupId)/kids/turtlebay_wally))
+        || (isFoundingKid('sam') && exists(/databases/$(database)/documents/groups/$(groupId)/kids/turtlebay_sam))
+        || (hasDirectory()
+          && directory().role == 'kid'
+          && directoryFamily() != 'turtlebay'
+          && exists(/databases/$(database)/documents/groups/$(groupId)/kids/$(directoryFamily() + '_' + directory().kidId)));
+    }
+
+    function inGroupAsParent(groupId) {
+      return hasDirectory()
+        && directory().role == 'parent'
+        && directoryFamily() != 'turtlebay'
+        && isParentOf(directoryFamily())
+        && exists(/databases/$(database)/documents/groups/$(groupId)/families/$(directoryFamily()));
+    }
+
+    function foundingInGroup(groupId) {
+      return isFoundingParent()
+        && exists(/databases/$(database)/documents/groups/$(groupId)/families/turtlebay);
+    }
+
+    function canReadGroup(groupId) {
+      return foundingInGroup(groupId) || inGroupAsParent(groupId) || inGroupAsKid(groupId);
+    }
+
+    function schoolSeesAssignments(groupId) {
+      return isSchoolWally()
+        && exists(/databases/$(database)/documents/groups/$(groupId)/kids/turtlebay_wally);
+    }
+
+    match /directory/{emailKeyId} {
+      allow get: if googleUser() && emailKeyId == emailKey();
+      allow list: if false;
+      allow create: if request.resource.data.email is string
+        && request.resource.data.familyId is string
+        && request.resource.data.familyId != 'turtlebay'
+        && request.resource.data.email.lower() == request.resource.data.email
+        && emailKeyId == request.resource.data.email.replace('@', '_at_').replace('.', '_')
+        && (
+          isFoundingParent()
+          || (request.resource.data.role == 'kid' && isParentOf(request.resource.data.familyId))
+        );
+      allow update: if isFoundingParent()
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.familyId == resource.data.familyId;
+      allow delete: if isFoundingParent();
+    }
+
+    match /families/{familyId} {
+      allow get: if isParentOf(familyId) || isKidIn(familyId)
+        || (isFoundingParent() && familyId != 'turtlebay');
+      allow list: if isFoundingParent();
+      allow create: if isFoundingParent()
+        && request.resource.data.keys().hasOnly(['name', 'invitedBy', 'groupIds', 'geminiMonthlyCapUsd', 'studyThresholds', 'roster'])
+        && (
+          (familyId == 'turtlebay' && request.resource.data.invitedBy == null)
+          || (familyId != 'turtlebay' && request.resource.data.invitedBy == email())
+        );
+      allow update: if isParentOf(familyId)
+        || (isFoundingParent() && familyId != 'turtlebay');
+      allow delete: if false;
+
+      match /kids/{kidId} {
+        allow get: if isParentOf(familyId) || isKidSelf(familyId, kidId)
+          || (isSchoolProfile(familyId, kidId) && !resource.data.keys().hasAny(['tasks', 'routines', 'completions']));
+        allow list: if isParentOf(familyId);
+        allow create: if (isParentOf(familyId) || isKidSelf(familyId, kidId)) && noFamilySecrets();
+        allow update: if ((isParentOf(familyId) || isKidSelf(familyId, kidId)) && noFamilySecrets())
+          || (isSchoolProfile(familyId, kidId)
+            && noFamilySecrets()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'credits', 'turtle', 'academicChecks', 'practiceDays', 'lessons', 'sessions', 'spellingSessions', 'study'
+            ]));
+        allow delete: if isParentOf(familyId);
+
+        // Tasks, routines, and their checkoffs. School sign-in cannot read this document.
+        match /private/{docId} {
+          allow read, write: if isParentOf(familyId) || isKidSelf(familyId, kidId);
+        }
+
+        match /edits/{editId} {
+          allow read: if isParentOf(familyId) || isKidSelf(familyId, kidId);
+          allow write: if false;
+        }
+      }
+
+      match /settings/{docId} {
+        allow read: if isParentOf(familyId) || isKidIn(familyId);
+        allow write: if isParentOf(familyId);
+      }
+    }
+
+    match /groups/{groupId} {
+      allow get: if canReadGroup(groupId);
+      allow list: if false;
+      allow create: if isFoundingParent()
+        && request.resource.data.ownerFamilyId == 'turtlebay';
+      allow update, delete: if isFoundingParent() && resource.data.ownerFamilyId == 'turtlebay';
+
+      match /families/{familyId} {
+        allow read: if canReadGroup(groupId);
+        allow create, delete: if isFoundingParent();
+        allow update: if false;
+      }
+
+      match /kids/{membershipId} {
+        allow read: if canReadGroup(groupId);
+        allow create, delete: if isFoundingParent();
+        allow update: if false;
+      }
+
+      match /assignments/{assignmentId} {
+        allow read: if canReadGroup(groupId) || schoolSeesAssignments(groupId);
+        allow create: if request.resource.data.authorFamilyId is string
+          && request.resource.data.authorEmail == email()
+          && request.resource.data.groupId == groupId
+          && isParentOf(request.resource.data.authorFamilyId)
+          && exists(/databases/$(database)/documents/groups/$(groupId)/families/$(request.resource.data.authorFamilyId))
+          && request.resource.data.keys().hasOnly([
+            'title', 'subject', 'notes', 'points', 'due', 'link', 'active', 'createdAt',
+            'authorFamilyId', 'authorEmail', 'authorFamilyName', 'groupId'
+          ]);
+        allow update, delete: if resource.data.authorFamilyId is string
+          && isParentOf(resource.data.authorFamilyId)
+          && request.resource.data.authorFamilyId == resource.data.authorFamilyId
+          && request.resource.data.authorEmail == resource.data.authorEmail
+          && request.resource.data.groupId == groupId;
+      }
     }
   }
 }
