@@ -16,6 +16,7 @@ import { ShopPage } from './pages/ShopPage'
 import { SpellingPage } from './pages/SpellingPage'
 import { StudyPage } from './pages/StudyPage'
 import { StudyPlayPage } from './pages/StudyPlayPage'
+import { PracticeMapPage } from './pages/PracticeMapPage'
 import { DojoPage } from './pages/DojoPage'
 import { RunnerPage } from './pages/RunnerPage'
 import { PebbleRunPage } from './pages/PebbleRunPage'
@@ -74,6 +75,7 @@ function RoutesView() {
       <Route path="/school" element={<SchoolGate><SchoolPage /></SchoolGate>} />
       <Route path="/school/run" element={<SchoolGate><PebbleRunPage /></SchoolGate>} />
       <Route path="/parent" element={<ParentGate><ParentPage /></ParentGate>} />
+      <Route path="/practice/map" element={<PracticeMapPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

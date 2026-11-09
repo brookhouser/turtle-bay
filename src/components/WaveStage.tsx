@@ -9,9 +9,14 @@ import { MecaMapBoard } from '../study/MecaMapBoard'
 import { nextMapPrompt, typedMatch, type MapPrompt } from '../study/mapQuestions'
 import { makeQuestion, pickWord, planWave, zoneOpen, type Question } from '../study/engine'
 import type { StudyUnit } from '../study/content'
-import { blankUnit } from '../study/engine'
+import { blankUnit, type UnitStudy } from '../study/engine'
 
 type Enemy = { id: number; x: number; y: number; hp: number; boss?: boolean }
+
+export type PracticeBoard = {
+  progress: UnitStudy
+  answer: (wordId: string, correct: boolean) => { justMastered: boolean; unlockName: string }
+}
 
 const LANE = [
   { x: 0.08, y: 0.72 },
@@ -41,11 +46,11 @@ function along(t: number): { x: number; y: number } {
   return LANE[LANE.length - 1]
 }
 
-export function WaveStage({ unit }: { unit: StudyUnit }) {
+export function WaveStage({ unit, practice }: { unit: StudyUnit; practice?: PracticeBoard }) {
   const { kid, world, answerStudy } = useBay()
   const family = world.families.find((entry) => entry.id === kid?.familyId)
   const thresholds = family?.studyThresholds
-  const progress = ensureUnit(kid?.study ?? { units: {} }, unit.id).unit
+  const progress = practice?.progress ?? ensureUnit(kid?.study ?? { units: {} }, unit.id).unit
   const kit = heroKit(unit, progress, thresholds)
   const [zone, setZone] = useState<ZoneId>('field')
   const [hero, setHero] = useState<HeroRuntime>(freshHero())
@@ -133,7 +138,7 @@ export function WaveStage({ unit }: { unit: StudyUnit }) {
   function resolve(correct: boolean, shaky: boolean) {
     const wordId = unit.kind === 'map' ? mapPrompt?.countryId : wordQuestion?.wordId
     if (!wordId) return
-    const result = answerStudy(unit.id, wordId, correct)
+    const result = practice ? practice.answer(wordId, correct) : answerStudy(unit.id, wordId, correct)
     const fired = correct ? chargeHero(hero, kit, shaky || Boolean(progress.words[wordId]?.weakened)) : { hero: noteMiss(hero), fired: null, weakenedHit: false, laneClear: false }
     setHero(fired.hero)
     if (fired.fired === 'spin-kick' || fired.fired === 'team-up' || fired.fired === 'super') {
