@@ -18,12 +18,12 @@ export const DECAY_PER_HOUR = {
 } as const
 
 export const MAX_PLANTS = 2
-export const REMATCH_PASS_COINS = 8
-export const REMATCH_TRY_COINS = 3
+export const REMATCH_PASS_COINS = 24
+export const REMATCH_TRY_COINS = 9
 
 export const SPELLING_WORD_POINTS = 10
 export const SPELLING_STREAK_BONUS = 2
-export const SPELLING_FEED_COINS = 10
+export const SPELLING_FEED_COINS = 30
 export const SPELLING_FEED_HUNGER = 16
 export const SPELLING_FEED_HAPPY = 8
 export const SPELLING_REVEAL_MS = 2000

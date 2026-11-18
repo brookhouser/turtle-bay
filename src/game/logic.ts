@@ -319,8 +319,8 @@ export function upgradeHabitat(kid: KidProfile): { kid: KidProfile; error?: stri
 }
 
 export function coinsForRun(base: number, accuracy: number, passed: boolean): number {
-  if (!passed) return Math.max(4, Math.round(base * 0.4))
-  return Math.max(1, Math.round(base * (0.9 + 0.1 * (accuracy / 100))))
+  if (!passed) return Math.max(12, Math.round(base * 0.4))
+  return Math.max(3, Math.round(base * (0.9 + 0.1 * (accuracy / 100))))
 }
 
 export function typingStats(correct: number, errors: number, startedAt: number, now: number) {

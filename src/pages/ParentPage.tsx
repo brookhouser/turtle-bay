@@ -20,7 +20,7 @@ export function ParentPage() {
   const [title, setTitle] = useState('')
   const [prompt, setPrompt] = useState('')
   const [focus, setFocus] = useState('')
-  const [coins, setCoins] = useState(15)
+  const [coins, setCoins] = useState(45)
   const [error, setError] = useState<string | null>(null)
   const [confirmClear, setConfirmClear] = useState(false)
 

@@ -8,7 +8,7 @@ export const LESSONS: Lesson[] = [
     subtitle: 'Park the left hand on A S D F.',
     newKeys: ['a', 's', 'd', 'f'],
     prompt: 'asdf asdf fad sad dad asdf a sad fad',
-    coinReward: 20,
+    coinReward: 60,
   },
   {
     id: 'hr-2',
@@ -17,7 +17,7 @@ export const LESSONS: Lesson[] = [
     subtitle: 'Park the right hand on J K L and semicolon.',
     newKeys: ['j', 'k', 'l', ';'],
     prompt: 'jkl; jkl; jak lad all jak a fall;',
-    coinReward: 22,
+    coinReward: 66,
   },
   {
     id: 'hr-3',
@@ -26,7 +26,7 @@ export const LESSONS: Lesson[] = [
     subtitle: 'Both hands stay on the home row.',
     newKeys: [],
     prompt: 'asdf jkl; a salad; a flask; ask dad all fall',
-    coinReward: 25,
+    coinReward: 75,
   },
   {
     id: 'hr-4',
@@ -35,7 +35,7 @@ export const LESSONS: Lesson[] = [
     subtitle: 'Real words, still on the home row.',
     newKeys: [],
     prompt: 'a fall salad; a sad lad; dad asks all flasks; a lass asks',
-    coinReward: 28,
+    coinReward: 84,
   },
   {
     id: 'hr-5',
@@ -44,7 +44,7 @@ export const LESSONS: Lesson[] = [
     subtitle: 'Keep a steady rhythm. Accuracy matters more than speed.',
     newKeys: [],
     prompt: 'dad asks a lad; a salad falls; ask all a flask; a sad lass falls',
-    coinReward: 32,
+    coinReward: 96,
   },
   {
     id: 'hr-6',
@@ -53,7 +53,7 @@ export const LESSONS: Lesson[] = [
     subtitle: 'Index fingers reach in to G and H.',
     newKeys: ['g', 'h'],
     prompt: 'a glad lad had a flag; hash a hall; a glass flask; dad had salad',
-    coinReward: 36,
+    coinReward: 108,
   },
   {
     id: 'hr-7',
@@ -62,7 +62,7 @@ export const LESSONS: Lesson[] = [
     subtitle: 'Middle fingers reach up. Left from D, right from K.',
     newKeys: ['e', 'i'],
     prompt: 'she sees a leaf; i like a lake; a high hill; i feel glad; slide a desk',
-    coinReward: 40,
+    coinReward: 120,
   },
   {
     id: 'hr-8',
@@ -71,7 +71,7 @@ export const LESSONS: Lesson[] = [
     subtitle: 'Index fingers reach up. Left from F, right from J.',
     newKeys: ['r', 'u'],
     prompt: 'a real lake; she hears a lark; a sure rule; i feel full; sail a real sea',
-    coinReward: 46,
+    coinReward: 138,
   },
 ]
 
