@@ -4,7 +4,7 @@ export const FOUNDING_PARENTS = [
 ]
 
 export const FOUNDING_KIDS = [
-  { key: 'sam', name: 'Sam', email: 'sambrookhouser@gmail.com', role: 'kid' as const, focus: 'rewards' as const },
+  { key: 'sam', name: 'Sam', email: 'sambrookhouser@gmail.com', role: 'kid' as const, focus: 'rewards' as const, grade: '7th grade' },
   { key: 'wally', name: 'Wally', email: 'wilsonbrookhouser@gmail.com', role: 'kid' as const, focus: 'turtle' as const },
 ]
 

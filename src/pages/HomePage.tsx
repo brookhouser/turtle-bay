@@ -6,6 +6,7 @@ import { careHint } from '../game/logic'
 import { Meters } from '../components/Meters'
 import { PencilIcon } from '../components/Icons'
 import { Stage, TierPath } from '../components/Habitat'
+import { SamStudio } from './SamStudio'
 import type { HabitatTier, TurtleMood } from '../types'
 
 export function HomePage() {
@@ -17,25 +18,7 @@ export function HomePage() {
   const [mood, setMood] = useState<TurtleMood | null>(null)
 
   if (!kid) return null
-  if (kid.focus === 'rewards') {
-    return (
-      <div className="stack">
-        <header className="page-head">
-          <h1>{kid.nickname}</h1>
-          <p>{Math.round(kid.turtle.coins)} coins. Finish chores, then spend them on a reward.</p>
-        </header>
-        <Link className="btn btn-primary" to="/chores">Open today’s list</Link>
-        <section className="panel">
-          <h2>Rewards</h2>
-          <ul className="check-list">
-            {kid.rewards.filter((reward) => reward.active).map((reward) => (
-              <li key={reward.id}><span>{reward.title}</span><span className="fine">{reward.cost} coins</span></li>
-            ))}
-          </ul>
-        </section>
-      </div>
-    )
-  }
+  if (kid.focus === 'rewards') return <SamStudio />
   const turtle = kid.turtle
   const resting: TurtleMood = turtle.happy < 35 || turtle.hunger < 30 ? 'low' : 'idle'
   const shown = mood ?? resting

@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { isChecked, type CheckTarget } from '../family/board'
 import { useBay } from '../context/useBay'
 import type { KidProfile, PersonalAssignment, RoutineItem, TaskItem } from '../types'
+import { SamStudio } from './SamStudio'
 
 export function ChoresPage() {
-  const { kid, toggleChore, redeemKidReward } = useBay()
+  const { kid, toggleChore } = useBay()
   const [message, setMessage] = useState<string | null>(null)
   if (!kid) return null
+  if (kid.focus === 'rewards') return <SamStudio />
   const morning = kid.routines.filter((item) => item.active && item.slot === 'morning')
   const evening = kid.routines.filter((item) => item.active && item.slot === 'evening')
   const tasks = kid.tasks.filter((item) => item.active)
@@ -28,20 +30,6 @@ export function ChoresPage() {
       <CheckList title="Evening" items={evening} kid={kid} kind="routine" onToggle={toggle} />
       <CheckList title="Tasks" items={tasks} kid={kid} kind="task" onToggle={toggle} />
       <CheckList title="Study" items={assignments} kid={kid} kind="assignment" onToggle={toggle} />
-      {kid.focus === 'rewards' ? (
-        <section className="panel">
-          <h2>Rewards</h2>
-          {kid.rewards.filter((reward) => reward.active).length === 0 ? <p>No rewards yet. A parent can add one.</p> : null}
-          <ul className="check-list">
-            {kid.rewards.filter((reward) => reward.active).map((reward) => (
-              <li key={reward.id}>
-                <span>{reward.title}</span>
-                <button type="button" className="btn btn-small" onClick={() => setMessage(redeemKidReward(reward.id))}>{reward.cost} coins</button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
     </div>
   )
 }
