@@ -24,6 +24,13 @@
       name="description"
       content="Turtle Bay is a kids pet game. Care for a turtle and earn coins with typing lessons."
     />
+    <meta name="theme-color" content="#8fd0c6" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Turtle Bay" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="%BASE_URL%manifest.json" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%icons/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -35,5 +42,16 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // GitHub Pages only. Dev and the Firebase hosting build use base "/" and skip this,
+      // so sign-in and saved bays keep working exactly as they do today.
+      ;(function () {
+        var base = '%BASE_URL%'
+        if (!('serviceWorker' in navigator) || base === '/') return
+        navigator.serviceWorker
+          .register(base + 'sw.js', { scope: base, updateViaCache: 'none' })
+          .catch(function () {})
+      })()
+    </script>
   </body>
 </html>

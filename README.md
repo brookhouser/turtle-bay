@@ -30,6 +30,8 @@ npm run build
 
 Serve the same folder locally with any static host whose root contains a `turtle-bay` directory, then open `/turtle-bay/`. A `file://` open of `index.html` will not load the scripts, because the build asks for `/turtle-bay/assets/...`.
 
+The Pages site can be installed. In Chrome on a Mac, the address bar shows Install app, and the app opens in its own window with no tabs or address bar. In Safari on macOS Sonoma or newer, use File > Add to Dock. The icon is Pebble, from `public/sprites/turtle-idle.png`. `public/manifest.json` names the app Turtle Bay, scopes it to `/turtle-bay/`, and uses standalone display, with fullscreen and then a minimal window if a browser cannot open a standalone window. `public/sw.js` loads the page from the network and does not keep an old copy, so a refresh shows the next build. It does not handle Firebase, Google sign-in, or fonts. Rebuild the icons with `python3 scripts/make-pwa-icons.py` before `npm run build`.
+
 ## Play the demo
 
 1. Stay on Kid bay. Pick a bay name and a PIN, then choose Start a new bay. The bay name is not a real name, and the app never asks for one.
