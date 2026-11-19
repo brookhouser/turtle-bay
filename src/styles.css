@@ -736,6 +736,9 @@ th { font-size: 0.9rem; }
   .tier-slot { min-width: 210px; }
 }
 
+.check-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.check-list li { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.chore-columns { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;

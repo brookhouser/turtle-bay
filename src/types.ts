@@ -113,16 +113,80 @@ export type CustomChallenge = {
   createdAt: string
 }
 
+export type RepeatMode = 'daily' | 'once'
+
+export type RoutineSlot = 'morning' | 'evening'
+
+export type CompletionKind = 'task' | 'routine' | 'assignment'
+
+export type TaskItem = {
+  id: string
+  title: string
+  notes: string
+  points: number
+  repeat: RepeatMode
+  active: boolean
+  createdAt: string
+}
+
+export type RoutineItem = {
+  id: string
+  title: string
+  slot: RoutineSlot
+  points: number
+  active: boolean
+}
+
+export type PersonalAssignment = {
+  id: string
+  title: string
+  subject: string
+  notes: string
+  points: number
+  due: string
+  link: string
+  active: boolean
+  createdAt: string
+}
+
+export type Completion = {
+  id: string
+  itemId: string
+  kind: CompletionKind
+  source: 'kid' | 'group'
+  groupId: string
+  day: string
+  pointsAwarded: number
+  happyAwarded: number
+  completedAt: string
+}
+
+export type RewardItem = {
+  id: string
+  title: string
+  cost: number
+  active: boolean
+}
+
+export type KidFocus = 'turtle' | 'rewards'
+
 export type KidProfile = {
   id: string
   nickname: string
   pinHash: string
+  googleEmail: string
+  focus: KidFocus
   turtle: TurtleState
   lessons: Record<string, LessonProgress>
   sessions: TypingSession[]
   spellingSessions: SpellingSession[]
   customChallenges: CustomChallenge[]
   practiceDays: string[]
+  tasks: TaskItem[]
+  routines: RoutineItem[]
+  assignments: PersonalAssignment[]
+  completions: Completion[]
+  rewards: RewardItem[]
   createdAt: string
 }
 

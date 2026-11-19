@@ -6,11 +6,18 @@ import { useBay } from '../context/useBay'
 import { TIER_SCENES, habitatUrl } from '../data/habitatScenes'
 import { CoinIcon } from './Icons'
 
-const LINKS = [
+const TURTLE_LINKS = [
   { to: '/home', label: 'Home' },
+  { to: '/chores', label: 'Chores' },
   { to: '/challenges', label: 'Challenges' },
   { to: '/shop', label: 'Shop' },
   { to: '/care', label: 'Care' },
+]
+
+const REWARD_LINKS = [
+  { to: '/home', label: 'Home' },
+  { to: '/chores', label: 'Chores' },
+  { to: '/challenges', label: 'Challenges' },
 ]
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -32,7 +39,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </NavLink>
         {mode === 'demo' ? <span className="mode-chip">Demo</span> : <span className="mode-chip live">Synced</span>}
         <nav className="nav" aria-label="Bay">
-          {LINKS.map((link) => (
+          {(kid?.focus === 'rewards' ? REWARD_LINKS : TURTLE_LINKS).map((link) => (
             <NavLink key={link.to} to={link.to} className={({ isActive }) => (isActive ? 'active' : undefined)}>
               {link.label}
             </NavLink>

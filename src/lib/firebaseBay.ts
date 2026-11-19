@@ -11,6 +11,7 @@ import {
 } from 'firebase/auth'
 import { collection, doc, getDoc, getFirestore, onSnapshot, setDoc } from 'firebase/firestore'
 import { createKid, normalizeKid } from '../game/logic'
+import { familyAccount } from '../family/roster'
 import { getAllowlist, getFamilyId, getFirebaseConfig } from './env'
 import { hashPin } from './pin'
 import type { KidProfile } from '../types'
@@ -138,6 +139,21 @@ export async function isParentUser(user: User): Promise<boolean> {
   if (!email || !user.emailVerified || !getAllowlist().includes(email)) return false
   const token = await user.getIdTokenResult()
   return token.signInProvider === 'google.com' && token.claims.email_verified === true
+}
+
+export async function signInFamily(): Promise<{ email: string }> {
+  try {
+    const cred = await signInWithPopup(getAuth(primaryApp()), new GoogleAuthProvider())
+    const email = cred.user.email?.toLowerCase() ?? ''
+    if (!familyAccount(email)) {
+      await signOut(getAuth(primaryApp()))
+      throw new Error('That Google account is not in this family.')
+    }
+    return { email }
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('not in this family')) throw error
+    throw friendlyAuth(error, 'Google sign in did not finish.')
+  }
 }
 
 export async function signInParent(): Promise<{ email: string }> {

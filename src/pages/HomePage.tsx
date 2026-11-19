@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BASIC_CLEAN_COST, BASIC_FEED_COST } from '../config'
 import { useBay } from '../context/useBay'
 import { careHint } from '../game/logic'
@@ -17,6 +17,25 @@ export function HomePage() {
   const [mood, setMood] = useState<TurtleMood | null>(null)
 
   if (!kid) return null
+  if (kid.focus === 'rewards') {
+    return (
+      <div className="stack">
+        <header className="page-head">
+          <h1>{kid.nickname}</h1>
+          <p>{Math.round(kid.turtle.coins)} coins. Finish chores, then spend them on a reward.</p>
+        </header>
+        <Link className="btn btn-primary" to="/chores">Open today’s list</Link>
+        <section className="panel">
+          <h2>Rewards</h2>
+          <ul className="check-list">
+            {kid.rewards.filter((reward) => reward.active).map((reward) => (
+              <li key={reward.id}><span>{reward.title}</span><span className="fine">{reward.cost} coins</span></li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    )
+  }
   const turtle = kid.turtle
   const resting: TurtleMood = turtle.happy < 35 || turtle.hunger < 30 ? 'low' : 'idle'
   const shown = mood ?? resting
@@ -121,6 +140,7 @@ export function HomePage() {
             </button>
           </div>
           <p className="hint" role="status">{message ?? careHint(turtle)}</p>
+          <Link className="btn" to="/chores">Today’s chores</Link>
         </section>
       </div>
       <TierPath current={turtle.habitatTier} onPick={(tier: HabitatTier) => navigate(`/habitat?pick=${tier}`)} />

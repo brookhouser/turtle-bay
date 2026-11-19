@@ -95,6 +95,13 @@ export function createKid(nickname: string, pinHash: string, id: string = crypto
     spellingSessions: [],
     customChallenges: [],
     practiceDays: [],
+    googleEmail: '',
+    focus: 'turtle',
+    tasks: [],
+    routines: [],
+    assignments: [],
+    completions: [],
+    rewards: [],
     createdAt: new Date(now).toISOString(),
   }
 }
@@ -154,6 +161,13 @@ export function normalizeKid(input: Partial<KidProfile> & { id: string; nickname
     spellingSessions: asSpellingSessions(input.spellingSessions),
     customChallenges: Array.isArray(input.customChallenges) ? input.customChallenges : [],
     practiceDays: Array.isArray(input.practiceDays) ? input.practiceDays : [],
+    googleEmail: typeof input.googleEmail === 'string' ? input.googleEmail : '',
+    focus: input.focus === 'rewards' ? 'rewards' : 'turtle',
+    tasks: Array.isArray(input.tasks) ? input.tasks : [],
+    routines: Array.isArray(input.routines) ? input.routines : [],
+    assignments: Array.isArray(input.assignments) ? input.assignments : [],
+    completions: Array.isArray(input.completions) ? input.completions : [],
+    rewards: Array.isArray(input.rewards) ? input.rewards : [],
     createdAt: input.createdAt ?? fresh.createdAt,
   }
 }

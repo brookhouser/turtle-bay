@@ -23,6 +23,9 @@ import type { FirebaseApi } from './firebaseApi'
 import { BayContext } from './useBay'
 import { markDemoImported, withDemoProgress } from '../lib/demoImport'
 import { hashPin } from '../lib/pin'
+import { claimFamilyKid, createFamilyKid } from '../family/accounts'
+import { addPersonalAssignment, addReward, addRoutine, addTask, isChecked, redeemReward, removePersonalAssignment, removeReward, removeRoutine, removeTask, toggleCheck, type CheckTarget } from '../family/board'
+import { familyAccount } from '../family/roster'
 import { loadSave, loadSession, persistSave, persistSession } from '../lib/storage'
 import type {
   ChallengeDraft,
@@ -46,6 +49,17 @@ export type BayContextValue = {
   signInKid: (nickname: string, pin: string) => Promise<string | null>
   signUpKid: (nickname: string, pin: string) => Promise<string | null>
   signInParent: (email?: string) => Promise<string | null>
+  signInAccount: (email?: string) => Promise<string | null>
+  toggleChore: (target: CheckTarget) => string | null
+  addKidRoutine: (kidId: string, title: string, slot: 'morning' | 'evening') => string | null
+  removeKidRoutine: (kidId: string, routineId: string) => string | null
+  addKidTask: (kidId: string, title: string) => string | null
+  removeKidTask: (kidId: string, taskId: string) => string | null
+  addKidAssignment: (kidId: string, title: string, due: string) => string | null
+  removeKidAssignment: (kidId: string, assignmentId: string) => string | null
+  addKidReward: (kidId: string, title: string, cost: number) => string | null
+  removeKidReward: (kidId: string, rewardId: string) => string | null
+  redeemKidReward: (rewardId: string) => string | null
   signOutBay: () => Promise<void>
   createKidBay: (nickname: string, pin: string) => Promise<string | null>
   renameTurtle: (name: string) => string | null
@@ -192,9 +206,28 @@ export function BayProvider({ children }: { children: ReactNode }) {
               setReady(true)
               return
             }
+            const account = familyAccount(email)
+            if (account?.role === 'kid') {
+              let loaded = await fb.loadKid(user.uid)
+              if (!loaded) {
+                loaded = createFamilyKid(account.email, user.uid)
+                if (loaded) await fb.saveKid(loaded)
+              }
+              if (!loaded) {
+                await fb.signOutBay()
+                setBootError('Could not open that kid bay.')
+                setReady(true)
+                return
+              }
+              const nextKid = normalizeKid({ ...loaded, googleEmail: account.email, focus: account.focus, turtle: applyDecay(loaded.turtle) })
+              setSave({ kids: [nextKid] })
+              setSession({ role: 'kid', kidId: nextKid.id })
+              setReady(true)
+              return
+            }
             if (!allowlist.includes(email) || !(await fb.isParentUser(user))) {
               await fb.signOutBay()
-              setBootError('That Google account is not on the parent list.')
+              setBootError('That Google account is not in this family.')
               setSession(null)
               setReady(true)
               return
@@ -314,6 +347,34 @@ export function BayProvider({ children }: { children: ReactNode }) {
     return null
   }
 
+  async function signInAccount(email?: string): Promise<string | null> {
+    const account = familyAccount(email ?? '')
+    if (mode === 'firebase') {
+      try {
+        const fb = fbRef.current ?? (await loadFirebase())
+        fbRef.current = fb
+        await fb.signInFamily()
+        setBootError(null)
+        return null
+      } catch (error) {
+        return error instanceof Error ? error.message : 'Google sign in did not finish.'
+      }
+    }
+    if (!account) return 'That Google account is not in this family.'
+    const stored = loadSave()
+    const kidsNormalized = stored.kids.map((entry) => normalizeKid(entry))
+    if (account.role === 'parent') {
+      writeSave({ kids: kidsNormalized })
+      rememberSession({ role: 'parent', email: account.email })
+      return null
+    }
+    const claimed = claimFamilyKid(kidsNormalized, account.email)
+    if (!claimed) return 'Could not open that kid.'
+    writeSave({ kids: claimed.kids.map((entry) => (entry.id === claimed.kid.id ? { ...claimed.kid, turtle: applyDecay(claimed.kid.turtle) } : entry)) })
+    rememberSession({ role: 'kid', kidId: claimed.kid.id })
+    return null
+  }
+
   async function signInParent(email?: string): Promise<string | null> {
     if (mode === 'firebase') {
       try {
@@ -420,6 +481,25 @@ export function BayProvider({ children }: { children: ReactNode }) {
     writeSave({ kids: [] })
   }
 
+  function editKid(kidId: string, run: (current: KidProfile) => { kid: KidProfile; error?: string }): string | null {
+    if (sessionRef.current?.role !== 'parent') return 'Parents edit the lists.'
+    const current = save.kids.find((entry) => entry.id === kidId)
+    if (!current) return 'Pick a kid bay first.'
+    const result = run(current)
+    if (result.error) return result.error
+    writeKid(result.kid)
+    return null
+  }
+
+  function toggleChore(target: CheckTarget): string | null {
+    const current = kidRef.current
+    if (!current) return 'Sign in to a kid bay first.'
+    const wasChecked = isChecked(current, target)
+    const result = mutate((kid) => toggleCheck(kid, target))
+    if (!result) pushToast(wasChecked ? 'Unchecked. Those coins came back out.' : 'Checked. Coins are in the jar.')
+    return result
+  }
+
   const value: BayContextValue = {
     ready,
     mode,
@@ -447,6 +527,17 @@ export function BayProvider({ children }: { children: ReactNode }) {
     feedPatty,
     addChallenge,
     clearDemoKids,
+    signInAccount,
+    toggleChore,
+    addKidRoutine: (kidId, title, slot) => editKid(kidId, (current) => addRoutine(current, { title, slot })),
+    removeKidRoutine: (kidId, routineId) => editKid(kidId, (current) => ({ kid: removeRoutine(current, routineId) })),
+    addKidTask: (kidId, title) => editKid(kidId, (current) => addTask(current, { title })),
+    removeKidTask: (kidId, taskId) => editKid(kidId, (current) => ({ kid: removeTask(current, taskId) })),
+    addKidAssignment: (kidId, title, due) => editKid(kidId, (current) => addPersonalAssignment(current, { title, due })),
+    removeKidAssignment: (kidId, assignmentId) => editKid(kidId, (current) => ({ kid: removePersonalAssignment(current, assignmentId) })),
+    addKidReward: (kidId, title, cost) => editKid(kidId, (current) => addReward(current, { title, cost })),
+    removeKidReward: (kidId, rewardId) => editKid(kidId, (current) => ({ kid: removeReward(current, rewardId) })),
+    redeemKidReward: (rewardId) => mutate((current) => redeemReward(current, rewardId)),
     pushToast,
   }
 

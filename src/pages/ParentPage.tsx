@@ -9,6 +9,7 @@ import { parseSpellingPrompt } from '../data/spelling'
 import { parseFocusKeys, practiceStreak } from '../game/logic'
 import { Meters } from '../components/Meters'
 import { Turtle } from '../components/Turtle'
+import { ChoreDesk } from './ChoreDesk'
 import type { ChallengeType, KidProfile } from '../types'
 
 export function ParentPage() {
@@ -109,6 +110,8 @@ export function ParentPage() {
           </form>
           <p className="fine">Use a bay name, not a real name. {mode === 'firebase' ? 'PIN needs 6 to 12 letters or numbers.' : 'PIN needs 4 to 12 letters or numbers.'}</p>
         </section>
+
+        {selected ? <ChoreDesk kid={selected} /> : null}
 
         <section className="panel">
           <h2>Add a challenge</h2>
