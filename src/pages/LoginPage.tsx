@@ -2,10 +2,11 @@ import { useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { APP_NAME } from '../config'
 import { useBay } from '../context/useBay'
+import { FAMILY_ACCOUNTS } from '../family/roster'
 import { Turtle } from '../components/Turtle'
 
 export function LoginPage() {
-  const { ready, session, kid, mode, allowlist, bootError, signInKid, signUpKid, signInParent } = useBay()
+  const { ready, session, kid, mode, allowlist, bootError, signInKid, signUpKid, signInParent, signInAccount } = useBay()
   const [tab, setTab] = useState<'kid' | 'parent'>('kid')
   const [nickname, setNickname] = useState('')
   const [pin, setPin] = useState('')
@@ -44,7 +45,28 @@ export function LoginPage() {
         <div className="login-copy">
           <p className="eyebrow">{mode === 'demo' ? 'Demo mode' : 'Synced bay'}</p>
           <h1>{APP_NAME}</h1>
-          <p className="lede">A small bay, a pet turtle, and lessons that fill the coin jar.</p>
+          <p className="lede">A small bay, a pet turtle, and the chores that fill the coin jar.</p>
+          <div className="parent-picks" aria-label="Family sign in">
+            {FAMILY_ACCOUNTS.map((person) => (
+              <button
+                key={person.email}
+                type="button"
+                className="btn"
+                disabled={busy}
+                onClick={() => {
+                  setBusy(true)
+                  setError(null)
+                  void signInAccount(mode === 'firebase' ? undefined : person.email).then((message) => {
+                    setBusy(false)
+                    if (message) setError(message)
+                  })
+                }}
+              >
+                {person.name} · {person.role}
+              </button>
+            ))}
+          </div>
+          <p className="fine">{mode === 'firebase' ? 'Those buttons use Google. Kevin, Beth, Sam, and Wally are the family accounts.' : 'Demo sign-in stands in for those Google accounts on this computer.'}</p>
           {bootError ? <p className="form-error" role="alert">{bootError}</p> : null}
           <div className="seg" role="tablist" aria-label="Who is signing in">
             <button type="button" role="tab" aria-selected={tab === 'kid'} className={tab === 'kid' ? 'on' : ''} onClick={() => { setTab('kid'); setError(null) }}>

@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BASIC_CLEAN_COST, BASIC_FEED_COST } from '../config'
 import { useBay } from '../context/useBay'
 import { careHint } from '../game/logic'
 import { Meters } from '../components/Meters'
 import { PencilIcon } from '../components/Icons'
 import { Stage, TierPath } from '../components/Habitat'
+import { SamStudio } from './SamStudio'
 import type { HabitatTier, TurtleMood } from '../types'
 
 export function HomePage() {
@@ -17,6 +18,7 @@ export function HomePage() {
   const [mood, setMood] = useState<TurtleMood | null>(null)
 
   if (!kid) return null
+  if (kid.focus === 'rewards') return <SamStudio />
   const turtle = kid.turtle
   const resting: TurtleMood = turtle.happy < 35 || turtle.hunger < 30 ? 'low' : 'idle'
   const shown = mood ?? resting
@@ -121,6 +123,7 @@ export function HomePage() {
             </button>
           </div>
           <p className="hint" role="status">{message ?? careHint(turtle)}</p>
+          <Link className="btn" to="/chores">Today’s chores</Link>
         </section>
       </div>
       <TierPath current={turtle.habitatTier} onPick={(tier: HabitatTier) => navigate(`/habitat?pick=${tier}`)} />

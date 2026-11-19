@@ -5,6 +5,7 @@ import { AppShell } from './components/Shell'
 import { BayProvider } from './context/BayContext'
 import { useBay } from './context/useBay'
 import { CarePage } from './pages/CarePage'
+import { ChoresPage } from './pages/ChoresPage'
 import { ChallengesPage } from './pages/ChallengesPage'
 import { HabitatPage } from './pages/HabitatPage'
 import { HomePage } from './pages/HomePage'
@@ -20,8 +21,9 @@ function KidGate({ children, named = false }: { children: ReactNode; named?: boo
   const { ready, session, kid } = useBay()
   if (!ready) return <p className="app-loading">Opening the bay...</p>
   if (!session || session.role !== 'kid' || !kid) return <Navigate to="/" replace />
-  if (named && !kid.turtle.named) return <Navigate to="/name" replace />
-  if (!named && kid.turtle.named) return <Navigate to="/home" replace />
+  const needsName = kid.focus !== 'rewards' && !kid.turtle.named
+  if (named && needsName) return <Navigate to="/name" replace />
+  if (!named && !needsName) return <Navigate to="/home" replace />
   return children
 }
 
@@ -42,6 +44,7 @@ function RoutesView() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/name" element={<KidGate><NamePage /></KidGate>} />
       <Route path="/home" element={<KidGate named><AppShell><HomePage /></AppShell></KidGate>} />
+      <Route path="/chores" element={<KidGate named><AppShell><ChoresPage /></AppShell></KidGate>} />
       <Route path="/challenges" element={<KidGate named><AppShell><ChallengesPage /></AppShell></KidGate>} />
       <Route path="/lesson/:lessonId" element={<KidGate named><LessonPage /></KidGate>} />
       <Route path="/custom/:challengeId" element={<KidGate named><LessonPage /></KidGate>} />
